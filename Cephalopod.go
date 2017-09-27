@@ -3,5 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Printf("dima %d", 12)
+	fmt.Printf("Cephalopods carry multiple hearts - definitely outsmarting us - v%d", 1)
+	fmt.Println("")
 }
