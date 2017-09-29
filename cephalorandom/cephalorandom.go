@@ -3,29 +3,59 @@ package cephalorandom
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
 )
 
+type randomGroup struct {
+	mean, length int
+}
+
 // GenerateRandomDataStore generates random DataStore for mock input data
-func GenerateRandomDataStore(length int, groups int) (cephalobjects.DataStore, error) {
+func GenerateRandomDataStore(length int, groups int, rho float64) (cephalobjects.DataStore, error) {
 	var randstore cephalobjects.DataStore
-	if length <= 0 || groups <= 0 {
-		return randstore, errors.New("eh")
+	if length <= 0 || groups <= 0 || rho < -1 || rho > 1 {
+		return randstore, errors.New("check input parameters")
 	}
 	source := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(source)
-	randstore.Basic = randomDPSlice(random, length)
+	randstore.Basic = randomDPSlice(random, length, groups, rho)
 	return randstore, nil
 }
 
-func randomDPSlice(r *rand.Rand, l int) []cephalobjects.DataPoint {
+func randomDPSlice(r *rand.Rand, l int, g int, rho float64) []cephalobjects.DataPoint {
 	randbasic := make([]cephalobjects.DataPoint, l)
-	for _, dp := range randbasic {
-		dp.X = r.NormFloat64()
-		dp.Y = r.NormFloat64()
+	groupseeds := generateGroups(r, l, g)
+	imer := 0
+	for _, group := range groupseeds {
+		for j := 0; j < group.length; j++ {
+			iter := imer + j
+			randbasic[iter].X = r.NormFloat64() + float64(group.mean)
+			randbasic[iter].Y = r.NormFloat64() + float64(group.mean)
+		}
+		imer += group.length
 	}
+	fmt.Println(randbasic)
 	return randbasic
 }
+
+func generateGroups(r *rand.Rand, l int, g int) []randomGroup {
+	groupseeds := make([]randomGroup, g)
+	lm := l
+	for i := range groupseeds {
+		groupseeds[i].mean = r.Intn(100)
+		groupseeds[i].length = int(l / g)
+		lm -= groupseeds[i].length
+		if i == g-2 {
+			groupseeds[i].length = lm
+		}
+	}
+	return groupseeds
+}
+
+// func generateCorrelated(a float64, b float64, rho float64) float64 {
+// 	return rho*b + math.Sqrt(1-math.Pow(rho, 2.0))*a
+// }
