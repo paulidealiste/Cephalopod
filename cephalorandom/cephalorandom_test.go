@@ -44,3 +44,14 @@ func TestGeneratedGroupsLength(t *testing.T) {
 		t.Errorf("These lengths must match but one is %d ant the other %d", sum, testlen)
 	}
 }
+
+// generates string of a predifined length
+func TestGenerateRandomString(t *testing.T) {
+	l := 10
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
+	test := RandStringBytes(r, l)
+	if len(test) != l {
+		t.Error("Generated string length doesn't match the required length")
+	}
+}

@@ -3,18 +3,19 @@ package cephalorandom
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
 )
 
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 type randomGroup struct {
 	mean, length int
 }
 
-// GenerateRandomDataStore generates random DataStore for mock input data
+// GenerateRandomDataStore generates random DataStore for mock input data (rho tba)
 func GenerateRandomDataStore(length int, groups int, rho float64) (cephalobjects.DataStore, error) {
 	var randstore cephalobjects.DataStore
 	if length <= 0 || groups <= 0 || rho < -1 || rho > 1 {
@@ -31,14 +32,15 @@ func randomDPSlice(r *rand.Rand, l int, g int, rho float64) []cephalobjects.Data
 	groupseeds := generateGroups(r, l, g)
 	imer := 0
 	for _, group := range groupseeds {
+		temp := RandStringBytes(r, 5)
 		for j := 0; j < group.length; j++ {
 			iter := imer + j
 			randbasic[iter].X = r.NormFloat64() + float64(group.mean)
 			randbasic[iter].Y = r.NormFloat64() + float64(group.mean)
+			randbasic[iter].A = temp
 		}
 		imer += group.length
 	}
-	fmt.Println(randbasic)
 	return randbasic
 }
 
@@ -54,6 +56,15 @@ func generateGroups(r *rand.Rand, l int, g int) []randomGroup {
 		}
 	}
 	return groupseeds
+}
+
+// RandStringBytes returns random letter string - used for group labels
+func RandStringBytes(r *rand.Rand, n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[r.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
 
 // func generateCorrelated(a float64, b float64, rho float64) float64 {
