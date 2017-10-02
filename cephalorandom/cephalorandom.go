@@ -3,6 +3,7 @@ package cephalorandom
 
 import (
 	"errors"
+	"math"
 	"math/rand"
 	"time"
 
@@ -35,8 +36,8 @@ func randomDPSlice(r *rand.Rand, l int, g int, rho float64) []cephalobjects.Data
 		temp := RandStringBytes(r, 5)
 		for j := 0; j < group.length; j++ {
 			iter := imer + j
-			randbasic[iter].X = r.NormFloat64() + float64(group.mean)
-			randbasic[iter].Y = r.NormFloat64() + float64(group.mean)
+			randbasic[iter].X = math.Abs(r.NormFloat64()) + float64(group.mean)
+			randbasic[iter].Y = math.Abs(r.NormFloat64()) + float64(group.mean)
 			randbasic[iter].A = temp
 		}
 		imer += group.length

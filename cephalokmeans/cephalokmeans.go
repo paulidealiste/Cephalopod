@@ -2,6 +2,7 @@
 package cephalokmeans
 
 import (
+	"math"
 	"math/rand"
 	"time"
 
@@ -15,10 +16,10 @@ func generateCentroids(input *cephalobjects.DataStore, k int) []cephalobjects.Da
 	datarange := cephaloutils.ExtremesRange(input)
 	source := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(source)
-	descriptors := cephaloutils.CalculateDescriptors(&datarange)
+	descriptors := cephaloutils.CalculateDescriptors(datarange)
 	for i := range centroids {
-		centroids[i].X = random.NormFloat64()
-		centroids[i].Y = random.NormFloat64()
+		centroids[i].X = math.Abs(random.NormFloat64())*descriptors.SdX + descriptors.MeanX
+		centroids[i].Y = math.Abs(random.NormFloat64())*descriptors.SdY + descriptors.MeanY
 		centroids[i].G = cephalorandom.RandStringBytes(random, 5)
 	}
 	return centroids

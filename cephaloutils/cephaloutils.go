@@ -37,11 +37,11 @@ func CalculateDescriptors(input []cephalobjects.DataPoint) cephalobjects.Descrip
 	meanX = sumX / li
 	meanY = sumY / li
 	for _, dp := range input {
-		ssX += math.Pow((dp.X - meanX), 2)
-		ssY += math.Pow((dp.Y - meanY), 2)
+		ssX += (dp.X - meanX) * (dp.X - meanX)
+		ssY += (dp.Y - meanY) * (dp.Y - meanY)
 	}
-	sdX = math.Sqrt(ssX/li - 1)
-	sdY = math.Sqrt(ssY/li - 1)
+	sdX = math.Sqrt(ssX / (li - 1))
+	sdY = math.Sqrt(ssY / (li - 1))
 	descs := cephalobjects.Descriptors{
 		MeanX: meanX,
 		MeanY: meanY,

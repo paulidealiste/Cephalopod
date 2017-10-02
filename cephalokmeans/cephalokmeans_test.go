@@ -1,6 +1,7 @@
 package cephalokmeans
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/paulidealiste/Cephalopod/cephalorandom"
@@ -16,12 +17,14 @@ func TestCentroidsGeneratorSpread(t *testing.T) {
 	if len(test) != k {
 		t.Error("Did not generate the adequate ammount of centroids")
 	}
+	fmt.Println(ranger)
+	fmt.Println(test)
 	for _, ce := range test {
-		if ce.X < ranger[0].X || ce.Y < ranger[0].Y {
-			t.Error("Generated centroids escaped lower bound of the data range")
+		if ce.X < ranger[0].X*2 || ce.Y < ranger[0].Y*2 {
+			t.Error("Generated centroids escaped lower bound of the data range (x2)")
 		}
-		if ce.X > ranger[1].X || ce.Y > ranger[1].Y {
-			t.Error("Generated centroids escaped upper bound of the data range")
+		if ce.X > ranger[1].X*2 || ce.Y > ranger[1].Y*2 {
+			t.Error("Generated centroids escaped upper bound of the data range (x2)")
 		}
 	}
 }
