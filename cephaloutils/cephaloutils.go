@@ -3,8 +3,11 @@ package cephaloutils
 
 import (
 	"math"
+	"math/rand"
+	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
+	"github.com/paulidealiste/Cephalopod/cephalorandom"
 )
 
 // ExtremesRange returns X and Y coordinates range
@@ -49,4 +52,32 @@ func CalculateDescriptors(input []cephalobjects.DataPoint) cephalobjects.Descrip
 		SdY:   sdY,
 	}
 	return descs
+}
+
+// TruncatedNormal generates truncated random normals
+func TruncatedNormal(desc cephalobjects.Descriptors, l int) []cephalobjects.DataPoint {
+	source := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(source)
+	truncgen := make([]cephalobjects.DataPoint, l)
+	upperBoundX := desc.MeanX + 2*desc.SdX
+	lowerBoundX := desc.MeanX - 2*desc.SdX
+	upperBoundY := desc.MeanY + 2*desc.SdY
+	lowerBoundY := desc.MeanY - 2*desc.SdY
+	for i := range truncgen {
+		for {
+			truncgen[i].X = math.Abs(random.NormFloat64())*desc.SdX + desc.MeanX
+			truncgen[i].Y = math.Abs(random.NormFloat64())*desc.SdY + desc.MeanY
+			truncgen[i].G = cephalorandom.RandStringBytes(random, 5)
+			if truncgen[i].X > lowerBoundX && truncgen[i].X < upperBoundX && truncgen[i].Y > lowerBoundY && truncgen[i].Y < upperBoundY {
+				break
+			}
+		}
+	}
+	return truncgen
+}
+
+// EuclideanDistance returns the L2 norm of two DataPoints
+func EuclideanDistance(p1 cephalobjects.DataPoint, p2 cephalobjects.DataPoint) float64 {
+	ed := math.Sqrt(math.Pow((p1.X-p2.X), 2) + math.Pow((p1.Y-p2.Y), 2))
+	return ed
 }

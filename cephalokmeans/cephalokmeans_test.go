@@ -17,14 +17,26 @@ func TestCentroidsGeneratorSpread(t *testing.T) {
 	if len(test) != k {
 		t.Error("Did not generate the adequate ammount of centroids")
 	}
-	fmt.Println(ranger)
-	fmt.Println(test)
 	for _, ce := range test {
 		if ce.X < ranger[0].X*2 || ce.Y < ranger[0].Y*2 {
 			t.Error("Generated centroids escaped lower bound of the data range (x2)")
 		}
 		if ce.X > ranger[1].X*2 || ce.Y > ranger[1].Y*2 {
 			t.Error("Generated centroids escaped upper bound of the data range (x2)")
+		}
+	}
+}
+
+// did centoid assignment assign each data point to a centroid-based group
+func TestCentroidAssignment(t *testing.T) {
+	k := 3
+	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
+	centroids := generateCentroids(&input, k)
+	assignCentroids(&input, centroids)
+	fmt.Println(input)
+	for _, dp := range input.Basic {
+		if dp.G == "" {
+			t.Error("Not all data points were assigned to corresponding centroids")
 		}
 	}
 }

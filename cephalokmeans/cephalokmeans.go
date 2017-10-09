@@ -2,25 +2,26 @@
 package cephalokmeans
 
 import (
-	"math"
-	"math/rand"
-	"time"
-
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
-	"github.com/paulidealiste/Cephalopod/cephalorandom"
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
 
 func generateCentroids(input *cephalobjects.DataStore, k int) []cephalobjects.DataPoint {
-	centroids := make([]cephalobjects.DataPoint, k)
 	datarange := cephaloutils.ExtremesRange(input)
-	source := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(source)
 	descriptors := cephaloutils.CalculateDescriptors(datarange)
-	for i := range centroids {
-		centroids[i].X = math.Abs(random.NormFloat64())*descriptors.SdX + descriptors.MeanX
-		centroids[i].Y = math.Abs(random.NormFloat64())*descriptors.SdY + descriptors.MeanY
-		centroids[i].G = cephalorandom.RandStringBytes(random, 5)
-	}
+	centroids := cephaloutils.TruncatedNormal(descriptors, k)
 	return centroids
+}
+
+func assignCentroids(input *cephalobjects.DataStore, centroids []cephalobjects.DataPoint) {
+	for _, dp := range input.Basic {
+		var td, tdp float64
+		for _, cp := range centroids {
+			td = cephaloutils.EuclideanDistance(dp, cp)
+			if td < tdp {
+				dp.G = cp.G
+			}
+			tdp = td
+		}
+	}
 }

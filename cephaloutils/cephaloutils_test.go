@@ -1,9 +1,12 @@
 package cephaloutils
 
 import (
-	"fmt"
+	"math"
+	"math/rand"
 	"testing"
+	"time"
 
+	"github.com/paulidealiste/Cephalopod/cephalobjects"
 	"github.com/paulidealiste/Cephalopod/cephalorandom"
 )
 
@@ -19,9 +22,31 @@ func TestExtremesRange(t *testing.T) {
 	}
 }
 
-// wheter descriptors return values
-func TestDescriptors(t *testing.T) {
+// Euclidean distance properties test
+func TestEuclideanDistance(t *testing.T) {
+	source := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(source)
+	p1 := cephalobjects.DataPoint{X: random.NormFloat64(), Y: random.NormFloat64()}
+	p2 := cephalobjects.DataPoint{X: random.NormFloat64(), Y: random.NormFloat64()}
+	test := EuclideanDistance(p1, p2)
+	internal := math.Sqrt(math.Pow((p1.X-p2.X), 2) + math.Pow((p1.Y-p2.Y), 2))
+	if test != internal {
+		t.Error("Obtained value is not an Euclidean distance")
+	}
+}
+
+// Wheter descriptors return values and are generated numbers really truncated to the desired boundaries (mean + 2SDs)
+func TestDescriptorsAndTruncatedNormal(t *testing.T) {
 	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
-	test := CalculateDescriptors(input.Basic)
-	fmt.Println(test)
+	desc := CalculateDescriptors(input.Basic)
+	test := TruncatedNormal(desc, 3)
+	upperBoundX := desc.MeanX + 2*desc.SdX
+	lowerBoundX := desc.MeanX - 2*desc.SdX
+	upperBoundY := desc.MeanY + 2*desc.SdY
+	lowerBoundY := desc.MeanY - 2*desc.SdY
+	for _, dp := range test {
+		if dp.X > upperBoundX || dp.X < lowerBoundX || dp.Y > upperBoundY || dp.Y < lowerBoundY {
+			t.Error("Generated data fell outside of desired boundaries (mean +/- 2SD)")
+		}
+	}
 }
