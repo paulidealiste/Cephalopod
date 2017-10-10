@@ -40,13 +40,22 @@ func TestDescriptorsAndTruncatedNormal(t *testing.T) {
 	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
 	desc := CalculateDescriptors(input.Basic)
 	test := TruncatedNormal(desc, 3)
-	upperBoundX := desc.MeanX + 2*desc.SdX
-	lowerBoundX := desc.MeanX - 2*desc.SdX
-	upperBoundY := desc.MeanY + 2*desc.SdY
-	lowerBoundY := desc.MeanY - 2*desc.SdY
+	upperBoundX := desc.MeanX + desc.SdX
+	lowerBoundX := desc.MeanX - desc.SdX
+	upperBoundY := desc.MeanY + desc.SdY
+	lowerBoundY := desc.MeanY - desc.SdY
 	for _, dp := range test {
 		if dp.X > upperBoundX || dp.X < lowerBoundX || dp.Y > upperBoundY || dp.Y < lowerBoundY {
 			t.Error("Generated data fell outside of desired boundaries (mean +/- 2SD)")
 		}
+	}
+}
+
+// Wheter min slice index is realy a slice minimum
+func TestMinSliceIndex(t *testing.T) {
+	input := []float64{5.1, 3.2, 4.2, 9.4}
+	test := MinSliceIndex(input)
+	if input[test] != 3.2 {
+		t.Error("Minimum index not found")
 	}
 }

@@ -14,14 +14,11 @@ func generateCentroids(input *cephalobjects.DataStore, k int) []cephalobjects.Da
 }
 
 func assignCentroids(input *cephalobjects.DataStore, centroids []cephalobjects.DataPoint) {
-	for _, dp := range input.Basic {
-		var td, tdp float64
-		for _, cp := range centroids {
-			td = cephaloutils.EuclideanDistance(dp, cp)
-			if td < tdp {
-				dp.G = cp.G
-			}
-			tdp = td
+	for i, dp := range input.Basic {
+		dists := make([]float64, len(centroids))
+		for i, cp := range centroids {
+			dists[i] = cephaloutils.EuclideanDistance(dp, cp)
 		}
+		input.Basic[i].G = centroids[cephaloutils.MinSliceIndex(dists)].G
 	}
 }

@@ -59,15 +59,16 @@ func TruncatedNormal(desc cephalobjects.Descriptors, l int) []cephalobjects.Data
 	source := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(source)
 	truncgen := make([]cephalobjects.DataPoint, l)
-	upperBoundX := desc.MeanX + 2*desc.SdX
-	lowerBoundX := desc.MeanX - 2*desc.SdX
-	upperBoundY := desc.MeanY + 2*desc.SdY
-	lowerBoundY := desc.MeanY - 2*desc.SdY
+	upperBoundX := desc.MeanX + desc.SdX
+	lowerBoundX := desc.MeanX - desc.SdX
+	upperBoundY := desc.MeanY + desc.SdY
+	lowerBoundY := desc.MeanY - desc.SdY
 	for i := range truncgen {
 		for {
 			truncgen[i].X = math.Abs(random.NormFloat64())*desc.SdX + desc.MeanX
 			truncgen[i].Y = math.Abs(random.NormFloat64())*desc.SdY + desc.MeanY
 			truncgen[i].G = cephalorandom.RandStringBytes(random, 5)
+			truncgen[i].A = truncgen[i].G
 			if truncgen[i].X > lowerBoundX && truncgen[i].X < upperBoundX && truncgen[i].Y > lowerBoundY && truncgen[i].Y < upperBoundY {
 				break
 			}
@@ -80,4 +81,17 @@ func TruncatedNormal(desc cephalobjects.Descriptors, l int) []cephalobjects.Data
 func EuclideanDistance(p1 cephalobjects.DataPoint, p2 cephalobjects.DataPoint) float64 {
 	ed := math.Sqrt(math.Pow((p1.X-p2.X), 2) + math.Pow((p1.Y-p2.Y), 2))
 	return ed
+}
+
+// MinSliceIndex returns the position of the slice's smallest element
+func MinSliceIndex(input []float64) int {
+	m := input[0]
+	var mi int
+	for i, e := range input {
+		if e < m {
+			m = e
+			mi = i
+		}
+	}
+	return mi
 }

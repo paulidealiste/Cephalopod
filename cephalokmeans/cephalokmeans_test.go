@@ -34,6 +34,7 @@ func TestCentroidAssignment(t *testing.T) {
 	centroids := generateCentroids(&input, k)
 	assignCentroids(&input, centroids)
 	fmt.Println(input)
+	fmt.Println(centroids)
 	for _, dp := range input.Basic {
 		if dp.G == "" {
 			t.Error("Not all data points were assigned to corresponding centroids")
