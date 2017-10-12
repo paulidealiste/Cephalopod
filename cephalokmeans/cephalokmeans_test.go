@@ -1,9 +1,9 @@
 package cephalokmeans
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/paulidealiste/Cephalopod/cephalobjects"
 	"github.com/paulidealiste/Cephalopod/cephalorandom"
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
@@ -27,17 +27,27 @@ func TestCentroidsGeneratorSpread(t *testing.T) {
 	}
 }
 
-// did centoid assignment assign each data point to a centroid-based group
-func TestCentroidAssignment(t *testing.T) {
+// did centoid assignment assign each data point to a centroid-based group and whether centroids are recalculated accordingly
+func TestCentroidAssignmentAndRecalculation(t *testing.T) {
 	k := 3
-	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
+	input, _ := cephalorandom.GenerateRandomDataStore(120, 3, 0.5)
 	centroids := generateCentroids(&input, k)
+	centroidsBak := make([]cephalobjects.DataPoint, len(centroids))
+	copy(centroidsBak, centroids)
 	assignCentroids(&input, centroids)
-	fmt.Println(input)
-	fmt.Println(centroids)
+	recalculateCentroids(input, centroids)
 	for _, dp := range input.Basic {
 		if dp.G == "" {
 			t.Error("Not all data points were assigned to corresponding centroids")
 		}
+	}
+	var counter int
+	for i := range centroids {
+		if centroids[i].X == centroidsBak[i].X && centroids[i].Y == centroidsBak[i].Y {
+			counter++
+		}
+	}
+	if counter == len(centroids) {
+		t.Error("Centroids were probably not recalculated")
 	}
 }
