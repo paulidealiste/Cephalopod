@@ -59,3 +59,27 @@ func TestMinSliceIndex(t *testing.T) {
 		t.Error("Minimum index not found")
 	}
 }
+
+// Wheter sameness test really tests for sameness
+func TestCheckIfSame(t *testing.T) {
+	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
+	input2, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
+	clone1 := make([]cephalobjects.DataPoint, len(input.Basic))
+	clone2 := make([]cephalobjects.DataPoint, len(input.Basic))
+	clone3 := make([]cephalobjects.DataPoint, len(input.Basic)-1)
+	copy(input.Basic, clone1)
+	copy(input.Basic, clone2)
+	copy(input.Basic[0:len(input.Basic)-1], clone3)
+	test, _ := CheckIfSame(clone1, clone2)
+	_, err := CheckIfSame(clone1, clone3)
+	test2, _ := CheckIfSame(clone1, input2.Basic)
+	if !test {
+		t.Error("Same slices reported different")
+	}
+	if err.Error() != "input slices must be of the same length" {
+		t.Error("Errors did not propagate when slices were of different size")
+	}
+	if test2 {
+		t.Error("Different slices reported same")
+	}
+}

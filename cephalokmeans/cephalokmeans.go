@@ -2,7 +2,6 @@
 package cephalokmeans
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
@@ -31,7 +30,6 @@ func recalculateCentroids(input cephalobjects.DataStore, centroids []cephalobjec
 	for _, dp := range input.Basic {
 		storage[dp.G] = append(storage[dp.G], dp)
 	}
-	fmt.Println(centroids)
 	for i, cp := range centroids {
 		descriptors := cephaloutils.CalculateDescriptors(storage[cp.G])
 		if !math.IsNaN(descriptors.MeanX) && !math.IsNaN(descriptors.MeanY) {
@@ -39,5 +37,4 @@ func recalculateCentroids(input cephalobjects.DataStore, centroids []cephalobjec
 			centroids[i].Y = descriptors.MeanY
 		}
 	}
-	fmt.Println(centroids)
 }

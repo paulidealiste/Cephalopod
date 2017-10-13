@@ -2,6 +2,7 @@
 package cephaloutils
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"time"
@@ -94,4 +95,22 @@ func MinSliceIndex(input []float64) int {
 		}
 	}
 	return mi
+}
+
+// CheckIfSame checks if all the values in the input arrays are equal
+func CheckIfSame(s1 []cephalobjects.DataPoint, s2 []cephalobjects.DataPoint) (bool, error) {
+	if len(s1) != len(s2) {
+		err := errors.New("input slices must be of the same length")
+		return false, err
+	}
+	var counter int
+	for i := range s1 {
+		if s1[i].X == s2[i].X && s1[i].Y == s2[i].Y {
+			counter++
+		}
+	}
+	if counter == len(s1) {
+		return true, nil
+	}
+	return false, nil
 }
