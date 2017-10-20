@@ -38,3 +38,8 @@ func recalculateCentroids(input cephalobjects.DataStore, centroids []cephalobjec
 		}
 	}
 }
+
+// Kmeans performs the clustering algorhithm and returns the clustered DataStore
+func Kmeans(input *cephalobjects.DataStore, k int) {
+
+}

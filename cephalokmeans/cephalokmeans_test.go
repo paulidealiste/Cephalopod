@@ -51,3 +51,15 @@ func TestCentroidAssignmentAndRecalculation(t *testing.T) {
 		t.Error("Centroids were probably not recalculated")
 	}
 }
+
+// whether kmeans performed the desired grouping
+func TestKmeans(t *testing.T) {
+	k := 3
+	input, _ := cephalorandom.GenerateRandomDataStore(120, 3, 0.5)
+	Kmeans(&input, k)
+	for _, dp := range input.Basic {
+		if dp.G == "" {
+			t.Error("Kmeans did not group all data points")
+		}
+	}
+}
