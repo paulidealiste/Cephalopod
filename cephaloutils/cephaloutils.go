@@ -114,3 +114,31 @@ func CheckIfSame(s1 []cephalobjects.DataPoint, s2 []cephalobjects.DataPoint) (bo
 	}
 	return false, nil
 }
+
+// PluckStringValues returns a list of string-based values from a list of DataPoint maps
+func PluckStringValues(s []cephalobjects.DataPoint, keyCode cephalobjects.GroupType) []string {
+	strval := make([]string, 0)
+	if keyCode == cephalobjects.Actual {
+		for _, dp := range s {
+			strval = append(strval, dp.A)
+		}
+	}
+	if keyCode == cephalobjects.Grouped {
+		for _, dp := range s {
+			strval = append(strval, dp.G)
+		}
+	}
+	return strval
+}
+
+// CheckAllTrue checks wheter all members of a boolean list are true
+func CheckAllTrue(b []bool) bool {
+	allTrue := true
+	for _, ob := range b {
+		if ob == false {
+			allTrue = false
+			break
+		}
+	}
+	return allTrue
+}

@@ -15,14 +15,18 @@ func generateCentroids(input *cephalobjects.DataStore, k int) []cephalobjects.Da
 	return centroids
 }
 
-func assignCentroids(input *cephalobjects.DataStore, centroids []cephalobjects.DataPoint) {
+func assignCentroids(input *cephalobjects.DataStore, centroids []cephalobjects.DataPoint) bool {
+	checking := make([]bool, 0)
 	for i, dp := range input.Basic {
 		dists := make([]float64, len(centroids))
 		for i, cp := range centroids {
 			dists[i] = cephaloutils.EuclideanDistance(dp, cp)
 		}
+		var tempG = input.Basic[i].G
 		input.Basic[i].G = centroids[cephaloutils.MinSliceIndex(dists)].G
+		checking = append(checking, tempG == input.Basic[i].G)
 	}
+	return cephaloutils.CheckAllTrue(checking)
 }
 
 func recalculateCentroids(input cephalobjects.DataStore, centroids []cephalobjects.DataPoint) {
@@ -39,7 +43,17 @@ func recalculateCentroids(input cephalobjects.DataStore, centroids []cephalobjec
 	}
 }
 
-// Kmeans performs the clustering algorhithm and returns the clustered DataStore
+// Kmeans performs the clustering algorhithm and assigns clusters to a DataStore
 func Kmeans(input *cephalobjects.DataStore, k int) {
-
+	maxiter := 200
+	curriter := 0
+	centroids := generateCentroids(input, k)
+	for {
+		recalculateCentroids(*input, centroids)
+		var noChanges = assignCentroids(input, centroids)
+		curriter++
+		if noChanges || curriter == maxiter {
+			break
+		}
+	}
 }

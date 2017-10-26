@@ -18,11 +18,11 @@ func TestCentroidsGeneratorSpread(t *testing.T) {
 		t.Error("Did not generate the adequate ammount of centroids")
 	}
 	for _, ce := range test {
-		if ce.X < ranger[0].X*2 || ce.Y < ranger[0].Y*2 {
-			t.Error("Generated centroids escaped lower bound of the data range (x2)")
+		if ce.X < ranger[0].X*3 || ce.Y < ranger[0].Y*3 {
+			t.Error("Generated centroids escaped lower bound of the data range (x3)")
 		}
-		if ce.X > ranger[1].X*2 || ce.Y > ranger[1].Y*2 {
-			t.Error("Generated centroids escaped upper bound of the data range (x2)")
+		if ce.X > ranger[1].X*3 || ce.Y > ranger[1].Y*3 {
+			t.Error("Generated centroids escaped upper bound of the data range (x3)")
 		}
 	}
 }
@@ -55,7 +55,7 @@ func TestCentroidAssignmentAndRecalculation(t *testing.T) {
 // whether kmeans performed the desired grouping
 func TestKmeans(t *testing.T) {
 	k := 3
-	input, _ := cephalorandom.GenerateRandomDataStore(120, 3, 0.5)
+	input, _ := cephalorandom.GenerateRandomDataStore(100000, 3, 0.5)
 	Kmeans(&input, k)
 	for _, dp := range input.Basic {
 		if dp.G == "" {

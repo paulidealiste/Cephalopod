@@ -1,6 +1,15 @@
 // Package cephalobjects define global data structures
 package cephalobjects
 
+// GroupType => Possible values for grouping keys in a DataPoint struct
+type GroupType int
+
+// Possible values for grouping keys in a DataPoint struct => enum-like
+const (
+	Actual GroupType = iota
+	Grouped
+)
+
 // DataPoint is the basic xy analytic data type with a simple annotation (A - actual, G - groupped)
 type DataPoint struct {
 	X, Y float64

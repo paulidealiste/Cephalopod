@@ -83,3 +83,21 @@ func TestCheckIfSame(t *testing.T) {
 		t.Error("Different slices reported same")
 	}
 }
+
+// Does plucking really returns string values from DataPoint objects (tests A instead of G)
+func TestPluckStringValues(t *testing.T) {
+	input, _ := cephalorandom.GenerateRandomDataStore(12, 3, 0.5)
+	test := PluckStringValues(input.Basic, cephalobjects.Actual)
+	test2 := PluckStringValues(input.Basic, cephalobjects.Grouped)
+	if test[0] != input.Basic[0].A && test[1] != input.Basic[1].A || test2[0] != input.Basic[0].G && test2[1] != input.Basic[1].G {
+		t.Error("String values were not plucked correctly")
+	}
+}
+
+func TestCheckAllTrue(t *testing.T) {
+	input := []bool{true, true, true, false}
+	test := CheckAllTrue(input)
+	if test == true {
+		t.Error("Checking for all true not true")
+	}
+}
