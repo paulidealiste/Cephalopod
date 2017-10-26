@@ -49,7 +49,7 @@ func generateGroups(r *rand.Rand, l int, g int) []randomGroup {
 	groupseeds := make([]randomGroup, g)
 	lm := l
 	for i := range groupseeds {
-		groupseeds[i].mean = r.Intn(100)
+		groupseeds[i].mean = r.Intn(3)
 		groupseeds[i].length = int(l / g)
 		lm -= groupseeds[i].length
 		if i == g-2 {

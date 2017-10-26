@@ -55,7 +55,7 @@ func TestCentroidAssignmentAndRecalculation(t *testing.T) {
 // whether kmeans performed the desired grouping
 func TestKmeans(t *testing.T) {
 	k := 3
-	input, _ := cephalorandom.GenerateRandomDataStore(100000, 3, 0.5)
+	input, _ := cephalorandom.GenerateRandomDataStore(120, 3, 0.5)
 	Kmeans(&input, k)
 	for _, dp := range input.Basic {
 		if dp.G == "" {
