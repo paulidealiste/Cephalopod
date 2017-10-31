@@ -142,3 +142,8 @@ func CheckAllTrue(b []bool) bool {
 	}
 	return allTrue
 }
+
+// DataPointSum returns sum of the DataPoint column elements
+func DataPointSum(input []cephalobjects.DataPoint) float64 {
+	return 0.9
+}

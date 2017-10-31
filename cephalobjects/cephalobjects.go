@@ -25,3 +25,8 @@ type DataStore struct {
 type Descriptors struct {
 	MeanX, MeanY, SdX, SdY float64
 }
+
+// ModelSummary holds the usual result structure from a linear regression a (intercept), b (slope) and R squared
+type ModelSummary struct {
+	A, B, R2 float64
+}

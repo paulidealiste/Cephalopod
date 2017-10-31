@@ -94,10 +94,16 @@ func TestPluckStringValues(t *testing.T) {
 	}
 }
 
+// Whether all values in the input array are true
 func TestCheckAllTrue(t *testing.T) {
 	input := []bool{true, true, true, false}
 	test := CheckAllTrue(input)
 	if test == true {
 		t.Error("Checking for all true not true")
 	}
+}
+
+//
+func TestDataPointSum(t *testing.T) {
+
 }
