@@ -28,14 +28,22 @@ func TestLeastSquares(t *testing.T) {
 	}
 }
 
-// Wheter cost function calculates non-zero costs
-func TestCost(t *testing.T) {
+// Wheter cost function calculates non-zero costs and returns re-calculated coeffs in a leanrning step as well as coeffs after descent loop
+func TestCostLearnDescent(t *testing.T) {
 	input, _ := cephalorandom.GenerateRandomDataStore(120, 3, 0.5)
 	var testPar cephalobjects.ModelSummary
 	testPar.A = 0.65
 	testPar.B = 1.34
 	test := cost(input.Basic, testPar)
+	test2 := learn(input.Basic, testPar)
+	test3 := gradientDescent(input.Basic)
 	if test == 0.0 || math.IsNaN(test) {
 		t.Error("Cost function does not work properly")
+	}
+	if test2.A == testPar.A && test2.B == testPar.B {
+		t.Error("Learning step not performed properly")
+	}
+	if test3.A == 0.0 && test3.B == 0.0 {
+		t.Error("Gradient descent not performed properly")
 	}
 }
