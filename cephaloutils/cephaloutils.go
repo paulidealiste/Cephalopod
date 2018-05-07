@@ -49,6 +49,8 @@ func CalculateDescriptors(input []cephalobjects.DataPoint) cephalobjects.Descrip
 	descs := cephalobjects.Descriptors{
 		MeanX: meanX,
 		MeanY: meanY,
+		VarX:  ssX / (li - 1),
+		VarY:  ssY / (li - 1),
 		SdX:   sdX,
 		SdY:   sdY,
 	}

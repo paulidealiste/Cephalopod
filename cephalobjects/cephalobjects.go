@@ -23,10 +23,19 @@ type DataStore struct {
 
 // Descriptors represent basic statistics from an array of DataPoints by X and Y coordinates
 type Descriptors struct {
-	MeanX, MeanY, SdX, SdY float64
+	MeanX, MeanY, VarX, VarY, SdX, SdY float64
 }
 
 // ModelSummary holds the usual result structure from a linear regression a (intercept), b (slope) and R squared
 type ModelSummary struct {
 	A, B, R2 float64
+}
+
+// AnovaSummary represents basic analysis of variance table
+type AnovaSummary struct {
+	SSM, SST, SSE float64
+	Dfm, Dft, Dfe float64
+	MSM, MST, MSE float64
+	F             float64
+	FIN           bool
 }
