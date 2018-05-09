@@ -37,5 +37,5 @@ type AnovaSummary struct {
 	Dfm, Dft, Dfe float64
 	MSM, MST, MSE float64
 	F             float64
-	FIN           bool
+	P             float64
 }

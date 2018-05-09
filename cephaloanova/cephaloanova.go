@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
+	"github.com/paulidealiste/Cephalopod/cephalodists"
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
 
@@ -25,7 +26,7 @@ func analysisOfVariance(input []cephalobjects.DataPoint) cephalobjects.AnovaSumm
 	summary.SST = desc.VarX * summary.Dft
 	channelSSM := make(chan ssmSummary)
 	channelSSE := make(chan sseSummary)
-	go modelSumOfSquares(input, channelSSM)
+	go modelSumOfSquares(input, desc, channelSSM)
 	go errorSumOfSquares(input, channelSSE)
 	ssm := <-channelSSM
 	sse := <-channelSSE
@@ -37,21 +38,26 @@ func analysisOfVariance(input []cephalobjects.DataPoint) cephalobjects.AnovaSumm
 	summary.MSM = summary.SSM / summary.Dfm
 	summary.MSE = summary.SSE / summary.Dfe
 	summary.F = summary.MSM / summary.MSE
+	summary.P = cephalodists.ProbabiltyF(summary.F, summary.Dfm, summary.Dfe)
 	return summary
 }
 
-func modelSumOfSquares(input []cephalobjects.DataPoint, c chan ssmSummary) {
-	var ssmAccumulator, meanAcucumulator, dfAccumulator float64
+func modelSumOfSquares(input []cephalobjects.DataPoint, gdesc cephalobjects.Descriptors, c chan ssmSummary) {
+	var ssmAccumulator, meanAcucumulator, dfAccumulator, groupCounter float64
 	var previousDP cephalobjects.DataPoint
-	for i, dp := range input {
-		meanAcucumulator += dp.X
-		if dp.A != previousDP.A || previousDP.A == "" {
-			ssmAccumulator += math.Pow(meanAcucumulator/float64(i+1), 2) * float64(i+1)
+	for _, dp := range input {
+		if dp.A != previousDP.A && previousDP.A != "" {
+			ssmAccumulator += float64(groupCounter) * math.Pow((meanAcucumulator/float64(groupCounter)-gdesc.MeanX), 2)
 			dfAccumulator++
 			meanAcucumulator = 0.0
+			groupCounter = 0.0
 		}
+		meanAcucumulator += dp.X
+		groupCounter++
 		previousDP = dp
 	}
+	ssmAccumulator += float64(groupCounter) * math.Pow((meanAcucumulator/float64(groupCounter)-gdesc.MeanX), 2)
+	dfAccumulator++
 	ssm := ssmSummary{df: dfAccumulator - 1, ssm: ssmAccumulator}
 	c <- ssm
 }
