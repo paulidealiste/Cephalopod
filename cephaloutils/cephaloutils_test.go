@@ -1,6 +1,7 @@
 package cephaloutils
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -44,6 +45,9 @@ func TestDescriptorsAndTruncatedNormal(t *testing.T) {
 	lowerBoundX := desc.MeanX - desc.SdX
 	upperBoundY := desc.MeanY + desc.SdY
 	lowerBoundY := desc.MeanY - desc.SdY
+	fmt.Println(desc)
+	covmat := CovarianceMatrix(desc)
+	fmt.Println(covmat)
 	for _, dp := range test {
 		if dp.X > upperBoundX || dp.X < lowerBoundX || dp.Y > upperBoundY || dp.Y < lowerBoundY {
 			t.Error("Generated data fell outside of desired boundaries (mean +/- 2SD)")

@@ -32,7 +32,7 @@ func ExtremesRange(input *cephalobjects.DataStore) []cephalobjects.DataPoint {
 // CalculateDescriptors returns means and SDs of a DataPoint slice
 func CalculateDescriptors(input []cephalobjects.DataPoint) cephalobjects.Descriptors {
 	var meanX, meanY, sdX, sdY float64
-	var sumX, sumY, ssX, ssY float64 = 0.0, 0.0, 0.0, 0.0
+	var sumX, sumY, ssX, ssY, sX, sY, sXsY float64 = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 	li := float64(len(input))
 	for _, dp := range input {
 		sumX += dp.X
@@ -41,20 +41,48 @@ func CalculateDescriptors(input []cephalobjects.DataPoint) cephalobjects.Descrip
 	meanX = sumX / li
 	meanY = sumY / li
 	for _, dp := range input {
-		ssX += (dp.X - meanX) * (dp.X - meanX)
-		ssY += (dp.Y - meanY) * (dp.Y - meanY)
+		sX += dp.X - meanX
+		ssX += sX * sX
+		sY += dp.Y - meanY
+		ssY += sY * sY
+		sXsY += sX * sY
 	}
 	sdX = math.Sqrt(ssX / (li - 1))
 	sdY = math.Sqrt(ssY / (li - 1))
 	descs := cephalobjects.Descriptors{
-		MeanX: meanX,
-		MeanY: meanY,
-		VarX:  ssX / (li - 1),
-		VarY:  ssY / (li - 1),
-		SdX:   sdX,
-		SdY:   sdY,
+		MeanX:   meanX,
+		MeanY:   meanY,
+		VarX:    ssX / (li - 1),
+		VarY:    ssY / (li - 1),
+		SdX:     sdX,
+		SdY:     sdY,
+		CovarXY: sXsY / (li - 1),
 	}
 	return descs
+}
+
+// CovarianceMatrix transforms descriptosrs to a matrix notation
+func CovarianceMatrix(desc cephalobjects.Descriptors) cephalobjects.DataMatrix {
+	var dmc cephalobjects.DataMatrix
+	dmc.Variables = []string{"X", "Y"}
+	dmc.Matrix = make([][]float64, len(dmc.Variables))
+	dmc.Grep = make(map[string]int)
+	for i, name := range dmc.Variables {
+		dmc.Matrix[i] = make([]float64, len(dmc.Variables))
+		dmc.Grep[name] = i
+		for j := range dmc.Variables {
+			if i == j {
+				if name == "X" {
+					dmc.Matrix[i][j] = desc.VarX
+				} else {
+					dmc.Matrix[i][j] = desc.VarY
+				}
+			} else {
+				dmc.Matrix[i][j] = desc.CovarXY
+			}
+		}
+	}
+	return dmc
 }
 
 // TruncatedNormal generates truncated random normals

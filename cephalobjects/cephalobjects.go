@@ -1,7 +1,7 @@
 // Package cephalobjects define global data structures
 package cephalobjects
 
-// GroupType => Possible values for grouping keys in a DataPoint struct
+// GroupType - Possible values for grouping keys in a DataPoint struct
 type GroupType int
 
 // Possible values for grouping keys in a DataPoint struct => enum-like
@@ -9,6 +9,25 @@ const (
 	Actual GroupType = iota
 	Grouped
 )
+
+// DistanceMetric - possible distances for calculating the distance matrix of a DataStore
+type DistanceMetric int
+
+// Possible distance metrics
+const (
+	Euclidean DistanceMetric = iota + 1
+	SquaredEuclidean
+	Manhattan
+	Maximum
+	Mahalanobis
+)
+
+// DataMatrix represents a simple matrix like structure with variable labels on cols and rows
+type DataMatrix struct {
+	Variables []string
+	Matrix    [][]float64
+	Grep      map[string]int
+}
 
 // DataPoint is the basic xy analytic data type with a simple annotation (A - actual, G - groupped)
 type DataPoint struct {
@@ -18,12 +37,13 @@ type DataPoint struct {
 
 // DataStore is a bit complex annotated slice-like data type (other properties to be added)
 type DataStore struct {
-	Basic []DataPoint
+	Basic    []DataPoint
+	Distance [][]float64
 }
 
 // Descriptors represent basic statistics from an array of DataPoints by X and Y coordinates
 type Descriptors struct {
-	MeanX, MeanY, VarX, VarY, SdX, SdY float64
+	MeanX, MeanY, VarX, VarY, SdX, SdY, CovarXY float64
 }
 
 // ModelSummary holds the usual result structure from a linear regression a (intercept), b (slope) and R squared
