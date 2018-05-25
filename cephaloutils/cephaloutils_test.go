@@ -48,6 +48,7 @@ func TestDescriptorsAndTruncatedNormal(t *testing.T) {
 	fmt.Println(desc)
 	covmat := CovarianceMatrix(desc)
 	fmt.Println(covmat)
+	InverseMatrix(covmat)
 	for _, dp := range test {
 		if dp.X > upperBoundX || dp.X < lowerBoundX || dp.Y > upperBoundY || dp.Y < lowerBoundY {
 			t.Error("Generated data fell outside of desired boundaries (mean +/- 2SD)")
@@ -61,6 +62,23 @@ func TestMinSliceIndex(t *testing.T) {
 	test := MinSliceIndex(input)
 	if input[test] != 3.2 {
 		t.Error("Minimum index not found")
+	}
+}
+
+// Tests the knownd matrix vector product
+
+func TestDotProduct(t *testing.T) {
+	testvec := []float64{-2, 40, 4}
+	var testmat cephalobjects.DataMatrix
+	testmat.Matrix = [][]float64{
+		{3.6885, 0.0627, -1.2821},
+		{0.0627, 0.0022, -0.024},
+		{-1.2821, -0.024, 0.4588},
+	}
+	product := DotProduct(testmat, testvec)
+	prodVec := []float64{-9.9974, -0.1334, 3.4394}
+	if product[2] != prodVec[2] {
+		t.Error("Product not valid")
 	}
 }
 

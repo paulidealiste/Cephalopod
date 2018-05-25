@@ -85,6 +85,48 @@ func CovarianceMatrix(desc cephalobjects.Descriptors) cephalobjects.DataMatrix {
 	return dmc
 }
 
+// InverseMatrix calculates the matrix inverse 2x2 matrix only
+func InverseMatrix(datma cephalobjects.DataMatrix) cephalobjects.DataMatrix {
+	var determinant float64
+	diag1, diag2 := 1.0, 1.0
+	var imc cephalobjects.DataMatrix
+	imc.Variables = datma.Variables
+	imc.Grep = datma.Grep
+	for i, mp := range datma.Matrix {
+		for j := range mp {
+			if i == j {
+				diag1 *= datma.Matrix[i][j]
+			} else {
+				diag2 *= datma.Matrix[i][j]
+			}
+		}
+	}
+	determinant = diag1 - diag2
+	datma.Matrix[0][0], datma.Matrix[1][1] = datma.Matrix[1][1], datma.Matrix[0][0]
+	datma.Matrix[0][1] = datma.Matrix[0][1] * -1
+	datma.Matrix[1][0] = datma.Matrix[1][0] * -1
+	imc.Matrix = datma.Matrix
+	for i, mp := range imc.Matrix {
+		for j := range mp {
+			imc.Matrix[i][j] *= 1 / determinant
+		}
+	}
+	return imc
+}
+
+// DotProduct returns the product of matrix and vector mutliplication
+func DotProduct(datma cephalobjects.DataMatrix, datve []float64) []float64 {
+	var dotprod []float64
+	for _, row := range datma.Matrix {
+		var rowProd float64
+		for i, rowVal := range row {
+			rowProd += datve[i] * rowVal
+		}
+		dotprod = append(dotprod, rowProd)
+	}
+	return dotprod
+}
+
 // TruncatedNormal generates truncated random normals
 func TruncatedNormal(desc cephalobjects.Descriptors, l int) []cephalobjects.DataPoint {
 	source := rand.NewSource(time.Now().UnixNano())
