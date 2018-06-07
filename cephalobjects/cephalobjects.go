@@ -22,6 +22,16 @@ const (
 	Mahalanobis
 )
 
+// LinkageCriteria - Hierarchical clustering linkage criteria
+type LinkageCriteria int
+
+// Possible linkage criteria
+const (
+	Complete LinkageCriteria = iota + 1
+	Single
+	UPGMA
+)
+
 // DataMatrix represents a simple matrix like structure with variable labels on cols and rows
 type DataMatrix struct {
 	Variables []string
