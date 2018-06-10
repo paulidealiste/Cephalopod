@@ -215,7 +215,9 @@ func CheckAllTrue(b []bool) bool {
 	return allTrue
 }
 
-// DataPointSum returns sum of the DataPoint column elements
-func DataPointSum(input []cephalobjects.DataPoint) float64 {
-	return 0.9
+// RandomID returns 8-digit integer IDs
+func RandomID() int {
+	source := rand.NewSource(time.Now().UnixNano())
+	driver := rand.New(source)
+	return 10000000 + driver.Intn(99999999-10000000)
 }
