@@ -128,3 +128,40 @@ func (gr *Graph) UndirectedEdge(n1 *GraphNode, n2 *GraphNode) {
 	n1.InsertAdjacent(n2)
 	n2.InsertAdjacent(n1)
 }
+
+// TREE STRUCTURE //
+
+// Tree is a basic binary tree-like structure
+type Tree struct {
+	root  *SepiaNode
+	left  *Tree
+	right *Tree
+}
+
+// SetRootNode sets the new data/key generic node as a tree root
+func (tr *Tree) SetRootNode(key string, title string, data interface{}) {
+	tr.root = createSepiaNode(key, title, data)
+}
+
+// InsertLeft is a generic insert left node/tree of the tree
+func (tr *Tree) InsertLeft(key string, title string, data interface{}) {
+	tr.left = &Tree{
+		root: createSepiaNode(key, title, data),
+	}
+}
+
+// InsertRight is a generic insert left node/tree of the tree
+func (tr *Tree) InsertRight(key string, title string, data interface{}) {
+	tr.right = &Tree{
+		root: createSepiaNode(key, title, data),
+	}
+}
+
+func createSepiaNode(key string, title string, data interface{}) *SepiaNode {
+	return &SepiaNode{
+		id:    cephaloutils.RandomID(),
+		key:   key,
+		Data:  data,
+		Title: title,
+	}
+}

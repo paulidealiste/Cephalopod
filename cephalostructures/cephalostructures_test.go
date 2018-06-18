@@ -33,3 +33,11 @@ func TestGraph(t *testing.T) {
 	fmt.Println(testcatalog["rxp"])
 	testgraph.InsertNode("mxp", "cinnamon", [5]int{20, 25, 30, 31, 32})
 }
+
+func TestBST(t *testing.T) {
+	testtree := Tree{}
+	testtree.SetRootNode("poq", "renard", [3]int{2, 4, 5})
+	testtree.InsertLeft("ror", "jackal", [3]int{6, 7, 8})
+	testtree.InsertRight("top", "queenston", [3]int{4, 3, 1})
+	fmt.Println(testtree.left.root)
+}
