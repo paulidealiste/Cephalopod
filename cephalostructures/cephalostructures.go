@@ -2,7 +2,7 @@
 package cephalostructures
 
 import (
-	"github.com/paulidealiste/Cephalopod/cephaloutils"
+	"github.com/paulidealiste/Cephalopod/cephalorandom"
 )
 
 // STACK STRUCTURE //
@@ -130,7 +130,7 @@ func (gr *Graph) InsertNode(key string, title string, data interface{}) {
 	gr.NodeCount++
 	nno := &GraphNode{
 		SepiaNode: SepiaNode{
-			id:    cephaloutils.RandomID(),
+			id:    cephalorandom.RandomID(),
 			key:   key,
 			Data:  data,
 			Title: title,
@@ -203,7 +203,7 @@ func (tr *Tree) InsertRight(key string, title string, data interface{}) {
 
 func createSepiaNode(key string, title string, data interface{}) *SepiaNode {
 	return &SepiaNode{
-		id:    cephaloutils.RandomID(),
+		id:    cephalorandom.RandomID(),
 		key:   key,
 		Data:  data,
 		Title: title,

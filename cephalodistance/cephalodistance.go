@@ -14,14 +14,20 @@ type pair struct {
 
 // CalculateDistanceMatrix fills the distance property of a datastore based on the supplied metric
 func CalculateDistanceMatrix(input *cephalobjects.DataStore, metric cephalobjects.DistanceMetric) {
-	input.Distance = make([][]float64, len(input.Basic))
-	for i := range input.Basic {
-		input.Distance[i] = make([]float64, len(input.Basic))
-		for j := range input.Basic {
+	var dmc cephalobjects.DataMatrix
+	dmc.Matrix = make([][]float64, len(input.Basic))
+	dmc.Variables = make([]string, len(input.Basic))
+	dmc.Grep = make(map[string]int)
+	for i, dp := range input.Basic {
+		dmc.Matrix[i] = make([]float64, len(input.Basic))
+		dmc.Variables = append(dmc.Variables, dp.UID)
+		for j, dpi := range input.Basic {
 			p := pair{x1: input.Basic[i].X, y1: input.Basic[i].Y, x2: input.Basic[j].X, y2: input.Basic[j].Y}
-			input.Distance[i][j] = p.distance(metric, input)
+			dmc.Matrix[i][j] = p.distance(metric, input)
+			dmc.Grep[dp.UID+" "+dpi.UID] = i + j
 		}
 	}
+	input.Distance = dmc
 }
 
 func (p pair) distance(metric cephalobjects.DistanceMetric, input *cephalobjects.DataStore) float64 {

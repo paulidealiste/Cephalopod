@@ -124,11 +124,3 @@ func TestCheckAllTrue(t *testing.T) {
 		t.Error("Checking for all true not true")
 	}
 }
-
-// Whether generator returns an id
-func TestRandomID(t *testing.T) {
-	test := RandomID()
-	if test < 10000000 || test > 99999999 {
-		t.Error("ID was not generated correctly")
-	}
-}

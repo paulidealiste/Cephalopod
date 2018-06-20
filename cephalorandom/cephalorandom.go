@@ -39,6 +39,7 @@ func randomDPSlice(r *rand.Rand, l int, g int, rho float64) []cephalobjects.Data
 			randbasic[iter].X = math.Abs(r.NormFloat64()) + float64(group.mean)
 			randbasic[iter].Y = math.Abs(r.NormFloat64()) + float64(group.mean)
 			randbasic[iter].A = temp
+			randbasic[iter].UID = RandStringBytes(r, 4)
 		}
 		imer += group.length
 	}
@@ -59,13 +60,20 @@ func generateGroups(r *rand.Rand, l int, g int) []randomGroup {
 	return groupseeds
 }
 
-// RandStringBytes returns random letter string - used for group labels
+// RandStringBytes returns random letter string - used for group labels and IDs
 func RandStringBytes(r *rand.Rand, n int) string {
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letterBytes[r.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+// RandomID returns 8-digit integer IDs
+func RandomID() int {
+	source := rand.NewSource(time.Now().UnixNano())
+	driver := rand.New(source)
+	return 10000000 + driver.Intn(99999999-10000000)
 }
 
 // func generateCorrelated(a float64, b float64, rho float64) float64 {

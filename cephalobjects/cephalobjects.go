@@ -41,6 +41,7 @@ type DataMatrix struct {
 
 // DataPoint is the basic xy analytic data type with a simple annotation (A - actual, G - groupped)
 type DataPoint struct {
+	UID  string
 	X, Y float64
 	A, G string
 }
@@ -48,7 +49,7 @@ type DataPoint struct {
 // DataStore is a bit complex annotated slice-like data type (other properties to be added)
 type DataStore struct {
 	Basic    []DataPoint
-	Distance [][]float64
+	Distance DataMatrix
 }
 
 // Descriptors represent basic statistics from an array of DataPoints by X and Y coordinates

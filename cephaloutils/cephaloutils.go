@@ -11,6 +11,9 @@ import (
 	"github.com/paulidealiste/Cephalopod/cephalorandom"
 )
 
+// Used for random strings
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 // ExtremesRange returns X and Y coordinates range
 func ExtremesRange(input *cephalobjects.DataStore) []cephalobjects.DataPoint {
 	extremes := make([]cephalobjects.DataPoint, 2)
@@ -213,11 +216,4 @@ func CheckAllTrue(b []bool) bool {
 		}
 	}
 	return allTrue
-}
-
-// RandomID returns 8-digit integer IDs
-func RandomID() int {
-	source := rand.NewSource(time.Now().UnixNano())
-	driver := rand.New(source)
-	return 10000000 + driver.Intn(99999999-10000000)
 }
