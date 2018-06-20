@@ -5,7 +5,23 @@ import (
 	"testing"
 )
 
+func TestStack(t *testing.T) {
+	fmt.Println("--STACK TEST--")
+	teststack := Stack{}
+	fmt.Println(teststack.Empty())
+	teststack.Push("Khaki")
+	teststack.Push("Aquamarine")
+	teststack.Push("Chocolate")
+	fmt.Println(teststack.Items)
+	popped := teststack.Pop()
+	fmt.Println(popped)
+	fmt.Println(teststack.Items)
+	fmt.Println(teststack.Size())
+	fmt.Println(teststack.Peek())
+}
+
 func TestQueue(t *testing.T) {
+	fmt.Println("--QUEUE TEST--")
 	testqueue := Queue{}
 	fmt.Println(testqueue.Empty())
 	testqueue.Enqueue(5.8)
@@ -18,6 +34,7 @@ func TestQueue(t *testing.T) {
 }
 
 func TestGraph(t *testing.T) {
+	fmt.Println("--GRAPH TEST--")
 	testgraph := Graph{}
 	testgraph.InsertNode("kxp", "lush", [5]int{1, 2, 3, 4, 5})
 	testgraph.InsertNode("exp", "soap", [5]int{5, 6, 7, 9, 10})
@@ -35,6 +52,7 @@ func TestGraph(t *testing.T) {
 }
 
 func TestBST(t *testing.T) {
+	fmt.Println("--TREE TEST--")
 	testtree := Tree{}
 	testtree.SetRootNode("poq", "renard", [3]int{2, 4, 5})
 	testtree.InsertLeft("ror", "jackal", [3]int{6, 7, 8})

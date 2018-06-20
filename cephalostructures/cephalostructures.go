@@ -5,6 +5,50 @@ import (
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
 
+// STACK STRUCTURE //
+
+// StackMethods describes common stack methods
+type StackMethods interface {
+	Empty() bool
+	Push(item interface{})
+	Pop() interface{}
+	Peek() interface{}
+	Size() bool
+}
+
+// Stack implementation of a FILO principle
+type Stack struct {
+	Items []interface{}
+}
+
+// Empty returns whether current stack is empty
+func (st *Stack) Empty() bool {
+	return len(st.Items) == 0
+}
+
+// Push adds a new item onto/ontop a stack
+func (st *Stack) Push(item interface{}) {
+	st.Items = append(st.Items, item)
+}
+
+// Pop removes the top element from the stack and returns it
+func (st *Stack) Pop() interface{} {
+	popped := st.Items[len(st.Items)-1]
+	st.Items = st.Items[:len(st.Items)-1]
+	return popped
+}
+
+// Peek return the top element without deleting it from the stack
+func (st *Stack) Peek() interface{} {
+	peeked := st.Items[len(st.Items)-1]
+	return peeked
+}
+
+// Size return the current stack size i.e. the number of elements
+func (st *Stack) Size() int {
+	return len(st.Items)
+}
+
 // QUEUE STRUCTURE //
 
 // QueueMethods describes common queue methods
