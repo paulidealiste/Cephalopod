@@ -217,3 +217,39 @@ func CheckAllTrue(b []bool) bool {
 	}
 	return allTrue
 }
+
+// DataMatrixMin returns the info on the minimum of the entire matrix
+func DataMatrixMin(dmc cephalobjects.DataMatrix, lower bool) cephalobjects.DataMatrixExtreme {
+	var dme cephalobjects.DataMatrixExtreme
+	dme.Value = dmc.Matrix[0][0]
+	var cummulative int
+	var lowercondition bool
+	for i := range dmc.Variables {
+		for j := range dmc.Variables {
+
+			if lower == true {
+				if i > j {
+					lowercondition = true
+				} else {
+					lowercondition = false
+				}
+			} else {
+				lowercondition = true
+			}
+
+			if lowercondition == true {
+				if dme.Value > dmc.Matrix[i][j] {
+					dme.Value = dmc.Matrix[i][j]
+					dme.Row = i
+					dme.Col = j
+					dme.Cumulative = cummulative
+					dme.RowName = dmc.Variables[i]
+					dme.ColName = dmc.Variables[j]
+				}
+			}
+			cummulative++
+
+		}
+	}
+	return dme
+}

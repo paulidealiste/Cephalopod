@@ -124,3 +124,29 @@ func TestCheckAllTrue(t *testing.T) {
 		t.Error("Checking for all true not true")
 	}
 }
+
+// Does the min function really returns the minimal value info
+func TestDataMatrixMin(t *testing.T) {
+	var dmc cephalobjects.DataMatrix
+	dmc.Grep = make(map[string]int)
+	dmc.Variables = []string{"ohgr", "cevin", "puppy"}
+	dmc.Matrix = [][]float64{
+		{10.00, 0.71, 3.73},
+		{0.71, 10.00, -1.87},
+		{3.73, -1.87, 10.00},
+	}
+	var cummulative int
+	for _, vn := range dmc.Variables {
+		for _, vni := range dmc.Variables {
+			dmc.Grep[vn+" "+vni] = cummulative
+			cummulative++
+		}
+	}
+
+	test := DataMatrixMin(dmc, true)
+	test1 := DataMatrixMin(dmc, false)
+	fmt.Println("Datamatrix extremes")
+	fmt.Println(test)
+	fmt.Println(test1)
+
+}

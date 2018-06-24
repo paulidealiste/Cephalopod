@@ -39,6 +39,17 @@ type DataMatrix struct {
 	Grep      map[string]int
 }
 
+// DataMatrixExtreme represents a single extreme value with the info on row and column
+// of the extreme value, as well as represntative column/row grep
+type DataMatrixExtreme struct {
+	Value      float64
+	Row        int
+	Col        int
+	RowName    string
+	ColName    string
+	Cumulative int
+}
+
 // DataPoint is the basic xy analytic data type with a simple annotation (A - actual, G - groupped)
 type DataPoint struct {
 	UID  string

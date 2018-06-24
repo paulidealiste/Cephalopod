@@ -18,13 +18,15 @@ func CalculateDistanceMatrix(input *cephalobjects.DataStore, metric cephalobject
 	dmc.Matrix = make([][]float64, len(input.Basic))
 	dmc.Variables = make([]string, len(input.Basic))
 	dmc.Grep = make(map[string]int)
+	var cummulative int
 	for i, dp := range input.Basic {
 		dmc.Matrix[i] = make([]float64, len(input.Basic))
 		dmc.Variables = append(dmc.Variables, dp.UID)
 		for j, dpi := range input.Basic {
 			p := pair{x1: input.Basic[i].X, y1: input.Basic[i].Y, x2: input.Basic[j].X, y2: input.Basic[j].Y}
 			dmc.Matrix[i][j] = p.distance(metric, input)
-			dmc.Grep[dp.UID+" "+dpi.UID] = i + j
+			dmc.Grep[dp.UID+" "+dpi.UID] = cummulative
+			cummulative++
 		}
 	}
 	input.Distance = dmc
