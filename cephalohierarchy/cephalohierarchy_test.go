@@ -9,7 +9,9 @@ import (
 
 func TestHierarchicalClustering(t *testing.T) {
 	input, _ := cephalorandom.GenerateRandomDataStore(20, 3, 0.5)
+	//
 	HierarchicalClustering(&input)
+	//
 	var dmc cephalobjects.DataMatrix
 	dmc.Grep = make(map[string]int)
 	dmc.Variables = []string{"ohgr", "cevin", "skinn", "puppy", "remis", "bites"}
@@ -28,4 +30,6 @@ func TestHierarchicalClustering(t *testing.T) {
 			cummulative++
 		}
 	}
+	constructTree(dmc)
+
 }
