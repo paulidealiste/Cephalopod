@@ -69,10 +69,10 @@ func CovarianceMatrix(desc cephalobjects.Descriptors) cephalobjects.DataMatrix {
 	var dmc cephalobjects.DataMatrix
 	dmc.Variables = []string{"X", "Y"}
 	dmc.Matrix = make([][]float64, len(dmc.Variables))
-	dmc.Grep = make(map[string]int)
+	dmc.Grep = make(map[string]cephalobjects.GrepFold)
 	for i, name := range dmc.Variables {
 		dmc.Matrix[i] = make([]float64, len(dmc.Variables))
-		dmc.Grep[name] = i
+		dmc.Grep[name] = cephalobjects.GrepFold{Row: i, Col: 0}
 		for j := range dmc.Variables {
 			if i == j {
 				if name == "X" {
@@ -221,27 +221,23 @@ func CheckAllTrue(b []bool) bool {
 // DataMatrixMin returns the info on the minimum of the entire matrix
 func DataMatrixMin(dmc cephalobjects.DataMatrix, lower bool, diag bool) cephalobjects.DataMatrixExtreme {
 	var dme cephalobjects.DataMatrixExtreme
-	if diag == true {
-		dme.Value = dmc.Matrix[0][0]
-	} else {
-		dme.Value = dmc.Matrix[1][0]
-	}
+	dme.Value = math.Inf(1)
 	var cummulative int
-	var lowercondition bool
+	var controlcondition bool
 	for i := range dmc.Variables {
 		for j := range dmc.Variables {
 
 			if lower == true {
-				if i > j {
-					lowercondition = true
+				if (diag == false && j < i) || (diag == true && j <= i) {
+					controlcondition = true
 				} else {
-					lowercondition = false
+					controlcondition = false
 				}
-			} else {
-				lowercondition = true
+			} else if (diag == false && j != i) || diag == true {
+				controlcondition = true
 			}
 
-			if lowercondition == true {
+			if controlcondition == true {
 				if dme.Value > dmc.Matrix[i][j] {
 					dme.Value = dmc.Matrix[i][j]
 					dme.Row = i

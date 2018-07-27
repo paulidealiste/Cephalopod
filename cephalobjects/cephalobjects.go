@@ -32,11 +32,17 @@ const (
 	UPGMA
 )
 
+// GrepFold shows row/column position for any entry in the DataMatrix Matrix
+type GrepFold struct {
+	Row int
+	Col int
+}
+
 // DataMatrix represents a simple matrix like structure with variable labels on cols and rows
 type DataMatrix struct {
 	Variables []string
 	Matrix    [][]float64
-	Grep      map[string]int
+	Grep      map[string]GrepFold
 }
 
 // DataMatrixExtreme represents a single extreme value with the info on row and column

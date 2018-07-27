@@ -13,7 +13,7 @@ func TestHierarchicalClustering(t *testing.T) {
 	HierarchicalClustering(&input)
 	//
 	var dmc cephalobjects.DataMatrix
-	dmc.Grep = make(map[string]int)
+	dmc.Grep = make(map[string]cephalobjects.GrepFold)
 	dmc.Variables = []string{"ohgr", "cevin", "skinn", "puppy", "remis", "bites"}
 	dmc.Matrix = [][]float64{
 		{0.00, 0.71, 5.66, 3.61, 4.24, 3.20},
@@ -23,13 +23,11 @@ func TestHierarchicalClustering(t *testing.T) {
 		{4.24, 3.54, 1.41, 1.00, 0.00, 1.12},
 		{3.20, 2.50, 2.50, 0.50, 1.12, 0.00},
 	}
-	var cummulative int
-	for _, vn := range dmc.Variables {
-		for _, vni := range dmc.Variables {
-			dmc.Grep[vn+" "+vni] = cummulative
-			cummulative++
+	for i, vn := range dmc.Variables {
+		for j, vni := range dmc.Variables {
+			dmc.Grep[vn+" "+vni] = cephalobjects.GrepFold{Row: i, Col: j}
 		}
 	}
-	constructTree(dmc)
-
+	hirstck := constructStack(dmc)
+	constructTree(hirstck)
 }
