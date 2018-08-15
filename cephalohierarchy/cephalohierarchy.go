@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
+	"github.com/paulidealiste/Cephalopod/cephalolambdas"
 	"github.com/paulidealiste/Cephalopod/cephalostructures"
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
@@ -13,8 +14,35 @@ import (
 func HierarchicalClustering(input *cephalobjects.DataStore) {
 }
 
-func constructTree(hirstck cephalostructures.Stack) {
+func constructGraph(hirstck cephalostructures.Stack) {
+	hirgraph := cephalostructures.Graph{}
+	var hirnodes []string
+	var prevnodes []string
+	for !hirstck.Empty() {
+		po := hirstck.Pop()
+		if t, ok := po.(cephalobjects.DataMatrix); ok { // Two-return syntax fot type assertion
+			for _, dex := range t.Variables {
+				hirgraph.InsertNode(dex, dex, po)
+				hirnodes = append(hirnodes, dex)
+			}
+			ne := cephalolambdas.Beakdiff(hirnodes, prevnodes)
+			od := cephalolambdas.Beakdiff(prevnodes, ne)
+			prevnodes = hirnodes
+			weaveEdge(&hirgraph, ne, od)
+		}
+	}
+}
 
+func weaveEdge(gp *cephalostructures.Graph, new []string, old []string) {
+	cat := gp.GraphCatalog()
+	for _, nnode := range new {
+		bfufn := func(s string) bool { return strings.Contains(s, nnode) }
+		cntns := cephalolambdas.Beakfilter(old, bfufn)
+		shrtr := cephaloutils.ShortestString(cntns)
+		if cat[shrtr] != nil {
+			gp.DirectedEdge(cat[shrtr], cat[nnode])
+		}
+	}
 }
 
 func constructStack(dmc cephalobjects.DataMatrix) cephalostructures.Stack {

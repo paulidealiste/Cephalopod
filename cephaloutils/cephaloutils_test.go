@@ -158,3 +158,11 @@ func TestDataMatrixMin(t *testing.T) {
 	fmt.Println(test1)
 
 }
+
+func TestShortestString(t *testing.T) {
+	teststrings := []string{"remork", "anak", "sterlinz", "amu", "pretkola"}
+	test := ShortestString(teststrings)
+	if test != "amu" {
+		t.Error("Haven't found the shortest string element")
+	}
+}

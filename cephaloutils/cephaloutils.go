@@ -253,3 +253,19 @@ func DataMatrixMin(dmc cephalobjects.DataMatrix, lower bool, diag bool) cephalob
 	}
 	return dme
 }
+
+// ShortestString - get shortest string from the array of strings
+func ShortestString(stc []string) string {
+	var shortest string
+	if len(stc) > 0 {
+		shortest = stc[0]
+		minlen := len(shortest)
+		for _, s := range stc {
+			if len(s) < minlen {
+				shortest = s
+				minlen = len(shortest)
+			}
+		}
+	}
+	return shortest
+}

@@ -1,6 +1,7 @@
 package cephalohierarchy
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
@@ -28,6 +29,7 @@ func TestHierarchicalClustering(t *testing.T) {
 			dmc.Grep[vn+" "+vni] = cephalobjects.GrepFold{Row: i, Col: j}
 		}
 	}
+	fmt.Println("Dum dummy tests!")
 	hirstck := constructStack(dmc)
-	constructTree(hirstck)
+	constructGraph(hirstck)
 }
