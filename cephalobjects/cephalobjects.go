@@ -29,7 +29,7 @@ type LinkageCriteria int
 const (
 	Complete LinkageCriteria = iota + 1
 	Single
-	UPGMA
+	Average
 )
 
 // GrepFold shows row/column position for any entry in the DataMatrix Matrix

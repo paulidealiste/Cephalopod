@@ -5,16 +5,21 @@ import (
 	"strings"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
+	"github.com/paulidealiste/Cephalopod/cephalodistance"
 	"github.com/paulidealiste/Cephalopod/cephalolambdas"
 	"github.com/paulidealiste/Cephalopod/cephalostructures"
 	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
 
-// HierarchicalClustering performs said clustering and returns a list of cluster steps
-func HierarchicalClustering(input *cephalobjects.DataStore) {
+// HierarchicalClustering performs said clustering and returns its graph representation
+func HierarchicalClustering(input *cephalobjects.DataStore, linkage cephalobjects.LinkageCriteria) cephalostructures.Graph {
+	cephalodistance.CalculateDistanceMatrix(input, cephalobjects.Euclidean)
+	hs := constructStack(input.Distance, linkage)
+	hg := constructGraph(hs)
+	return hg
 }
 
-func constructGraph(hirstck cephalostructures.Stack) {
+func constructGraph(hirstck cephalostructures.Stack) cephalostructures.Graph {
 	hirgraph := cephalostructures.Graph{}
 	var hirnodes []string
 	var prevnodes []string
@@ -31,6 +36,7 @@ func constructGraph(hirstck cephalostructures.Stack) {
 			weaveEdge(&hirgraph, ne, od)
 		}
 	}
+	return hirgraph
 }
 
 func weaveEdge(gp *cephalostructures.Graph, new []string, old []string) {
@@ -45,18 +51,18 @@ func weaveEdge(gp *cephalostructures.Graph, new []string, old []string) {
 	}
 }
 
-func constructStack(dmc cephalobjects.DataMatrix) cephalostructures.Stack {
+func constructStack(dmc cephalobjects.DataMatrix, linkage cephalobjects.LinkageCriteria) cephalostructures.Stack {
 	squarePusher := cephalostructures.Stack{}
 	squarePusher.Push(dmc)
 	for len(dmc.Matrix[0]) > 1 {
 		dmm := cephaloutils.DataMatrixMin(dmc, true, false)
-		transformDataMatrix(&dmc, dmm)
+		transformDataMatrix(&dmc, dmm, linkage)
 		squarePusher.Push(dmc)
 	}
 	return squarePusher
 }
 
-func transformDataMatrix(dmc *cephalobjects.DataMatrix, dmm cephalobjects.DataMatrixExtreme) {
+func transformDataMatrix(dmc *cephalobjects.DataMatrix, dmm cephalobjects.DataMatrixExtreme, linkage cephalobjects.LinkageCriteria) {
 	pilaf, nlab := connectNearestLabels(dmc.Variables, dmm.RowName, dmm.ColName)
 	inmat := make([][]float64, len(pilaf))
 	ingrep := make(map[string]cephalobjects.GrepFold)
@@ -66,9 +72,9 @@ func transformDataMatrix(dmc *cephalobjects.DataMatrix, dmm cephalobjects.DataMa
 			if i == j {
 				inmat[i][j] = 0.0
 			} else if rowname == nlab {
-				inmat[i][j] = valueSingleLinkage(nlab, colname, dmc)
+				inmat[i][j] = linkageFunction(nlab, colname, dmc, linkage)
 			} else if colname == nlab {
-				inmat[i][j] = valueSingleLinkage(nlab, rowname, dmc)
+				inmat[i][j] = linkageFunction(nlab, rowname, dmc, linkage)
 			} else {
 				inmat[i][j] = grepValueFromMatrix(rowname, colname, dmc)
 			}
@@ -86,14 +92,38 @@ func grepValueFromMatrix(rowname string, colname string, dmco *cephalobjects.Dat
 	return dmco.Matrix[cupos.Row][cupos.Col]
 }
 
-func valueSingleLinkage(nlab string, alab string, dmco *cephalobjects.DataMatrix) float64 {
+func linkageFunction(nlab string, alab string, dmco *cephalobjects.DataMatrix, linkage cephalobjects.LinkageCriteria) float64 {
+	var dist float64
 	targets := strings.Split(nlab, ",")
 	slv1 := grepValueFromMatrix(targets[0], alab, dmco)
 	slv2 := grepValueFromMatrix(targets[1], alab, dmco)
+	switch linkage {
+	case cephalobjects.Single:
+		dist = singleComparator(slv1, slv2)
+	case cephalobjects.Complete:
+		dist = completeComparator(slv1, slv2)
+	case cephalobjects.Average:
+		dist = averageComparator(slv1, slv2)
+	}
+	return dist
+}
+
+func singleComparator(slv1 float64, slv2 float64) float64 {
 	if slv1 <= slv2 {
 		return slv1
 	}
 	return slv2
+}
+
+func completeComparator(slv1 float64, slv2 float64) float64 {
+	if slv1 > slv2 {
+		return slv1
+	}
+	return slv2
+}
+
+func averageComparator(slv1 float64, slv2 float64) float64 {
+	return (slv1 + slv2) / 2
 }
 
 func connectNearestLabels(varlabs []string, rc string, cc string) ([]string, string) {
