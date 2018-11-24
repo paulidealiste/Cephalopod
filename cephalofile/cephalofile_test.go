@@ -1,6 +1,7 @@
 package cephalofile
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -16,5 +17,14 @@ func TestExportDataStore(t *testing.T) {
 	op, err := os.Stat("../dump.json")
 	if op == nil || err != nil {
 		t.Error("File not found or generated")
+	}
+}
+
+// Is Iris data properly read from a .csv
+func TestImportCSV(t *testing.T) {
+	rawiris := ImportCSV("iris.csv")
+	fmt.Println(rawiris[0])
+	if len(rawiris) == 0 {
+		t.Error("Probarbly not imported at all")
 	}
 }
