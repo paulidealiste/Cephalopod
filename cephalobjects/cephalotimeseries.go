@@ -50,6 +50,22 @@ func (cts *CephaloTimeSeries) FindRange(start time.Time, end time.Time) ([]*Ceph
 	return cts.root.findRange(start, end)
 }
 
+//Delete removes the designated node from the time series tree
+func (cts *CephaloTimeSeries) Delete(dattime time.Time) error {
+	if cts.root == nil {
+		return errors.New("Deletion can not be performed in an empty tree")
+	}
+	fakeParent := &CephaloTimeNode{right: cts.root}
+	err := cts.root.delete(dattime, fakeParent)
+	if err != nil {
+		return err
+	}
+	if fakeParent.right == nil {
+		cts.root = nil
+	}
+	return nil
+}
+
 //Node methods considered private (insert, find)
 func (ctn *CephaloTimeNode) insert(dattime time.Time, data float64) error {
 	nctt := CephaloTimeNode{datetime: dattime, data: data}
@@ -111,5 +127,70 @@ func findRangeInner(ctn *CephaloTimeNode, start time.Time, end time.Time, cb fun
 	}
 	if end.After(ctn.datetime) {
 		findRangeInner(ctn.right, start, end, cb)
+	}
+}
+
+func (ctn *CephaloTimeNode) findMax(parent *CephaloTimeNode) (*CephaloTimeNode, *CephaloTimeNode) {
+	if ctn == nil {
+		return &CephaloTimeNode{}, parent
+	}
+	if ctn.right == nil {
+		return ctn, parent
+	}
+	return ctn.right.findMax(ctn)
+}
+
+func (ctn *CephaloTimeNode) findMin(parent *CephaloTimeNode) (*CephaloTimeNode, *CephaloTimeNode) {
+	if ctn == nil {
+		return &CephaloTimeNode{}, parent
+	}
+	if ctn.left == nil {
+		return ctn, parent
+	}
+	return ctn.left.findMin(ctn)
+}
+
+func (ctn *CephaloTimeNode) replaceNode(parent, replacement *CephaloTimeNode) {
+	if ctn == nil {
+		return
+	}
+	if ctn == parent.left {
+		parent.left = replacement
+	}
+	parent.right = replacement
+}
+
+func (ctn *CephaloTimeNode) delete(dattime time.Time, parent *CephaloTimeNode) error {
+	if ctn == nil {
+		return errors.New("Can't delete from a nil node")
+	}
+	switch {
+	case dattime.Before(ctn.datetime):
+		return ctn.left.delete(dattime, ctn)
+	case dattime.After(ctn.datetime):
+		return ctn.right.delete(dattime, ctn)
+	default:
+		//If node is leaf node it has no children then remove it from its parent
+		if ctn.left == nil && ctn.right == nil {
+			ctn.replaceNode(parent, nil)
+			return nil
+		}
+		//If node is half-leaf it has one of the children, so replace node by its child node
+		if ctn.left == nil {
+			ctn.replaceNode(parent, ctn.right)
+			return nil
+		}
+		if ctn.right == nil {
+			ctn.replaceNode(parent, ctn.left)
+			return nil
+		}
+		//If the node is inner then steps are:
+		//1. in the left subtree find largest
+		leftmax, leftmaxparent := ctn.left.findMax(ctn)
+		//2. replace my value and data with
+		ctn.datetime = leftmax.datetime
+		ctn.data = leftmax.data
+		//3. remove replacement node
+		return leftmax.delete(leftmax.datetime, leftmaxparent)
 	}
 }

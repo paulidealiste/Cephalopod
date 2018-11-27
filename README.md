@@ -6,5 +6,4 @@ k-means clustering, linear regression via least squares and via gradient descent
 ___
 Structures:
 queue, graph, binary tree
-___
-Interactive REPL for data input, generation and results
+timeseries represented by a binary tree
