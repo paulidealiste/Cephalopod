@@ -16,6 +16,7 @@ type CephaloTimeNode struct {
 }
 
 type CephaloTimeSeries struct {
+	size int
 	root *CephaloTimeNode
 }
 
@@ -28,8 +29,10 @@ func NewCTS() CephaloTimeSeries {
 func (cts *CephaloTimeSeries) Insert(dattime time.Time, data float64) error {
 	if cts.root == nil {
 		cts.root = &CephaloTimeNode{datetime: dattime, data: data}
+		cts.size++
 		return nil
 	}
+	cts.size++
 	return cts.root.insert(dattime, data)
 }
 
@@ -50,7 +53,7 @@ func (cts *CephaloTimeSeries) FindRange(start time.Time, end time.Time) ([]*Ceph
 	return cts.root.findRange(start, end)
 }
 
-//Delete removes the designated node from the time series tree
+//Delete removes the designated datapoint from the time series tree
 func (cts *CephaloTimeSeries) Delete(dattime time.Time) error {
 	if cts.root == nil {
 		return errors.New("Deletion can not be performed in an empty tree")
@@ -63,8 +66,54 @@ func (cts *CephaloTimeSeries) Delete(dattime time.Time) error {
 	if fakeParent.right == nil {
 		cts.root = nil
 	}
+	cts.size--
 	return nil
 }
+
+//TraversalMap offers inorder traversal of the timeseries with a callback/map function returning a datapoint pointer
+func (cts *CephaloTimeSeries) TraversalMap(ctn *CephaloTimeNode, callback func(*CephaloTimeNode)) {
+	if ctn == nil {
+		return
+	}
+	cts.TraversalMap(ctn.left, callback)
+	callback(ctn)
+	cts.TraversalMap(ctn.right, callback)
+}
+
+//EndpointsMap offers inorder traversal along the specified duration units
+//(corresponding to last observation within duration unit) along with a callback/map function
+func (cts *CephaloTimeSeries) EndpointsMap(period time.Duration, ctn *CephaloTimeNode, callback func(*CephaloTimeNode)) {
+	runningnode, _ := ctn.findMin(nil)
+	cts.TraversalMap(ctn, func(ctn *CephaloTimeNode) {
+		controltime := runningnode.datetime.Add(period)
+		if ctn.datetime.Equal(controltime) || ctn.datetime.After(controltime) {
+			callback(ctn)
+			runningnode = ctn
+		}
+	})
+}
+
+//PeriodApply perfoms the series partial application of the supplied function, thus returning
+//an enetierly new series of the period endpoints length (last duration unit) with data transformed
+//accordingly. It is expected that the applied function returns a new CephaloTimeNode instead of
+//a pointer to an already used one
+func (cts *CephaloTimeSeries) PeriodApply(period time.Duration, ctn *CephaloTimeNode, applied func([]*CephaloTimeNode) CephaloTimeNode) CephaloTimeSeries {
+	nts := NewCTS()
+	runningnode, _ := ctn.findMin(nil)
+	var runnernodes []*CephaloTimeNode
+	cts.TraversalMap(ctn, func(*CephaloTimeNode) {
+		controltime := runningnode.datetime.Add(period)
+		runnernodes = append(runnernodes, ctn)
+		if ctn.datetime.Equal(controltime) || ctn.datetime.After(controltime) {
+			calcnode := applied(runnernodes)
+			nts.Insert(calcnode.datetime, calcnode.data)
+			runnernodes = nil
+		}
+	})
+	return nts
+}
+
+//PeriodMean is a convenience function for usage in conjunction with the PeriodApply.
 
 //Node methods considered private (insert, find)
 func (ctn *CephaloTimeNode) insert(dattime time.Time, data float64) error {
@@ -193,4 +242,12 @@ func (ctn *CephaloTimeNode) delete(dattime time.Time, parent *CephaloTimeNode) e
 		//3. remove replacement node
 		return leftmax.delete(leftmax.datetime, leftmaxparent)
 	}
+}
+
+//AbsDuration returns the absolute value of the supplied time.Duration
+func AbsDuration(duration time.Duration) time.Duration {
+	if duration < 0 {
+		return duration * -1
+	}
+	return duration
 }

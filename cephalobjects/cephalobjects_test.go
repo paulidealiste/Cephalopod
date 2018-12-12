@@ -116,6 +116,28 @@ func TestCTSforTimeSeries(t *testing.T) {
 	err = testtree.Delete(dd)
 	fmt.Println(err)
 
+	fmt.Println("Tree traversal")
+	testtree.TraversalMap(testtree.root, func(ctn *CephaloTimeNode) {
+	})
+	fmt.Println("Tree traversal with endpoints")
+	testtree.EndpointsMap(time.Minute*11, testtree.root, func(ctn *CephaloTimeNode) {
+		fmt.Println(ctn.datetime)
+	})
+
+	fmt.Println("PeriodApplication")
+	meantree := testtree.PeriodApply(time.Minute*20, testtree.root, func(runo []*CephaloTimeNode) CephaloTimeNode {
+		newnode := CephaloTimeNode{datetime: runo[0].datetime, data: runo[0].data}
+		return newnode
+	})
+	fmt.Println(meantree.size)
+
 	fmt.Println("End of tree tests")
 
+}
+
+func TestAbsDuration(t *testing.T) {
+	test := AbsDuration(-time.Minute * 21)
+	if test < 0 {
+		t.Error("Not really an absolute value is it?")
+	}
 }
