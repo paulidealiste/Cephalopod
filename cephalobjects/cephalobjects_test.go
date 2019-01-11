@@ -120,8 +120,8 @@ func TestCTSforTimeSeries(t *testing.T) {
 	testtree.TraversalMap(testtree.root, func(ctn *CephaloTimeNode) {
 	})
 	fmt.Println("Tree traversal with endpoints")
-	testtree.EndpointsMap(time.Minute*11, testtree.root, func(ctn *CephaloTimeNode) {
-		fmt.Println(ctn.datetime)
+	testtree.EndpointsMap(time.Minute*21, testtree.root, func(ctn *CephaloTimeNode) {
+		// fmt.Println(ctn.datetime)
 	})
 
 	fmt.Println("PeriodApplication")
@@ -130,7 +130,15 @@ func TestCTSforTimeSeries(t *testing.T) {
 		return newnode
 	})
 	fmt.Println(meantree.size)
-
+	fmt.Println("RollingApplication")
+	rolltree := testtree.RollApply(time.Minute*20, testtree.root, 1, func(nuno []*CephaloTimeNode) CephaloTimeNode {
+		newnode := CephaloTimeNode{datetime: nuno[0].datetime, data: nuno[0].data}
+		return newnode
+	})
+	fmt.Println(rolltree.size)
+	fmt.Println("RollingMeanApplication")
+	meanrolltree := testtree.RollMean(time.Minute*20, 1)
+	fmt.Println(meanrolltree.size)
 	fmt.Println("End of tree tests")
 
 }

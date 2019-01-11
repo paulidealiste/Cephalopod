@@ -84,11 +84,11 @@ func (cts *CephaloTimeSeries) TraversalMap(ctn *CephaloTimeNode, callback func(*
 //(corresponding to last observation within duration unit) along with a callback/map function
 func (cts *CephaloTimeSeries) EndpointsMap(period time.Duration, ctn *CephaloTimeNode, callback func(*CephaloTimeNode)) {
 	runningnode, _ := ctn.findMin(nil)
-	cts.TraversalMap(ctn, func(ctn *CephaloTimeNode) {
+	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
 		controltime := runningnode.datetime.Add(period)
-		if ctn.datetime.Equal(controltime) || ctn.datetime.After(controltime) {
+		if current.datetime.Equal(controltime) || current.datetime.After(controltime) {
 			callback(ctn)
-			runningnode = ctn
+			runningnode = current
 		}
 	})
 }
@@ -101,19 +101,50 @@ func (cts *CephaloTimeSeries) PeriodApply(period time.Duration, ctn *CephaloTime
 	nts := NewCTS()
 	runningnode, _ := ctn.findMin(nil)
 	var runnernodes []*CephaloTimeNode
-	cts.TraversalMap(ctn, func(*CephaloTimeNode) {
+	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
 		controltime := runningnode.datetime.Add(period)
-		runnernodes = append(runnernodes, ctn)
-		if ctn.datetime.Equal(controltime) || ctn.datetime.After(controltime) {
+		if current.datetime.Equal(controltime) || current.datetime.After(controltime) {
 			calcnode := applied(runnernodes)
 			nts.Insert(calcnode.datetime, calcnode.data)
 			runnernodes = nil
+			runningnode = current
+		}
+		runnernodes = append(runnernodes, current)
+	})
+	return nts
+}
+
+//Window-based methods (using FindRange for start-end window extraction)
+
+//RollApply provides duration-based rolling window application of the callback function.
+//Upon finishing it returns new CephaloTimeSeries, nearest resampled to the provided duration
+func (cts *CephaloTimeSeries) RollApply(period time.Duration, ctn *CephaloTimeNode, minn int, applied func([]*CephaloTimeNode) CephaloTimeNode) CephaloTimeSeries {
+	nts := NewCTS()
+	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
+		rollwinstart := current.datetime.Add(-period) //TODO - left, right and center align
+		rollwinend := current.datetime
+		inrange, _ := current.findRange(rollwinstart, rollwinend)
+		if len(inrange) >= minn {
+			calcnode := applied(inrange)
+			nts.Insert(calcnode.datetime, calcnode.data)
 		}
 	})
 	return nts
 }
 
-//PeriodMean is a convenience function for usage in conjunction with the PeriodApply.
+//RollMean provides the usual rolling mean (moving average) of the time series,
+//but based on the period rather than the number of observations
+func (cts *CephaloTimeSeries) RollMean(period time.Duration, minn int) CephaloTimeSeries {
+	return cts.RollApply(period, cts.root, minn, func(currents []*CephaloTimeNode) CephaloTimeNode {
+		nctt := CephaloTimeNode{datetime: currents[len(currents)-1].datetime, data: 0}
+		var valdata float64
+		for _, cu := range currents {
+			valdata += cu.data
+		}
+		nctt.data = valdata / float64(len(currents))
+		return nctt
+	})
+}
 
 //Node methods considered private (insert, find)
 func (ctn *CephaloTimeNode) insert(dattime time.Time, data float64) error {
