@@ -11,13 +11,13 @@ func TestCTSforNodes(t *testing.T) {
 
 	fmt.Println("Node tests")
 
-	test := CephaloTimeNode{datetime: time.Now(), data: rand.Float64()}
+	test := CephaloTimeNode{Datetime: time.Now(), Data: rand.Float64()}
 
 	//Test targets
-	dd := test.datetime
-	ds := test.datetime
-	ad := test.datetime
-	as := test.datetime
+	dd := test.Datetime
+	ds := test.Datetime
+	ad := test.Datetime
+	as := test.Datetime
 
 	//Loop based insert
 	for i := 0; i < 100; i++ {
@@ -41,24 +41,24 @@ func TestCTSforNodes(t *testing.T) {
 		t.Error("Should have failed when end is before start")
 	}
 	rfound, _ := test.findRange(ds.Add(-5*time.Minute), dd.Add(5*time.Minute))
-	fmt.Println(rfound[0].datetime)
+	fmt.Println(rfound[0].Datetime)
 
-	//Find max/min datetime CephaloTimeNode
+	//Find max/min Datetime CephaloTimeNode
 	max, parentMax := test.findMax(nil)
 	min, parentMin := test.findMin(nil)
 	fmt.Println("Max and parent")
-	fmt.Println(max.datetime)
-	fmt.Println(parentMax.datetime)
+	fmt.Println(max.Datetime)
+	fmt.Println(parentMax.Datetime)
 	fmt.Println("Min and parent")
-	fmt.Println(min.datetime)
-	fmt.Println(parentMin.datetime)
+	fmt.Println(min.Datetime)
+	fmt.Println(parentMin.Datetime)
 
 	//Delete tests
-	test.delete(parentMax.datetime, nil) //Delete half-leaf node with right child
-	test.delete(max.datetime, nil)       //Delete leaf node -- max is re-declared as its parent after the delete
+	test.delete(parentMax.Datetime, nil) //Delete half-leaf node with right child
+	test.delete(max.Datetime, nil)       //Delete leaf node -- max is re-declared as its parent after the delete
 	newmax, _ := test.findMax(nil)
-	fmt.Println(newmax.datetime)         //Since previous max is deleted new one can be obtained
-	test.delete(parentMin.datetime, nil) //Delete half-leaf node with left child
+	fmt.Println(newmax.Datetime)         //Since previous max is deleted new one can be obtained
+	test.delete(parentMin.Datetime, nil) //Delete half-leaf node with left child
 
 	test.delete(dd, nil)
 
@@ -111,34 +111,34 @@ func TestCTSforTimeSeries(t *testing.T) {
 	}
 
 	rfound, _ := testtree.FindRange(ds.Add(-5*time.Minute), dd.Add(5*time.Minute))
-	fmt.Println(rfound[0].datetime)
+	fmt.Println(rfound[0].Datetime)
 
 	err = testtree.Delete(dd)
 	fmt.Println(err)
 
 	fmt.Println("Tree traversal")
-	testtree.TraversalMap(testtree.root, func(ctn *CephaloTimeNode) {
+	testtree.TraversalMap(testtree.Root, func(ctn *CephaloTimeNode) {
 	})
 	fmt.Println("Tree traversal with endpoints")
-	testtree.EndpointsMap(time.Minute*21, testtree.root, func(ctn *CephaloTimeNode) {
-		// fmt.Println(ctn.datetime)
+	testtree.EndpointsMap(time.Minute*21, testtree.Root, func(ctn *CephaloTimeNode) {
+		// fmt.Println(ctn.Datetime)
 	})
 
 	fmt.Println("PeriodApplication")
-	meantree := testtree.PeriodApply(time.Minute*20, testtree.root, func(runo []*CephaloTimeNode) CephaloTimeNode {
-		newnode := CephaloTimeNode{datetime: runo[0].datetime, data: runo[0].data}
+	meantree := testtree.PeriodApply(time.Minute*20, testtree.Root, func(runo []*CephaloTimeNode) CephaloTimeNode {
+		newnode := CephaloTimeNode{Datetime: runo[0].Datetime, Data: runo[0].Data}
 		return newnode
 	})
-	fmt.Println(meantree.size)
+	fmt.Println(meantree.Size)
 	fmt.Println("RollingApplication")
-	rolltree := testtree.RollApply(time.Minute*20, testtree.root, 1, func(nuno []*CephaloTimeNode) CephaloTimeNode {
-		newnode := CephaloTimeNode{datetime: nuno[0].datetime, data: nuno[0].data}
+	rolltree := testtree.RollApply(time.Minute*20, testtree.Root, 1, func(nuno []*CephaloTimeNode) CephaloTimeNode {
+		newnode := CephaloTimeNode{Datetime: nuno[0].Datetime, Data: nuno[0].Data}
 		return newnode
 	})
-	fmt.Println(rolltree.size)
+	fmt.Println(rolltree.Size)
 	fmt.Println("RollingMeanApplication")
 	meanrolltree := testtree.RollMean(time.Minute*20, 1)
-	fmt.Println(meanrolltree.size)
+	fmt.Println(meanrolltree.Size)
 	fmt.Println("End of tree tests")
 
 }

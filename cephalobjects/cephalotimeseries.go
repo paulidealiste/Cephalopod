@@ -1,4 +1,4 @@
-// Package cephalobjects define global data structures
+// Package cephalobjects define global Data structures
 package cephalobjects
 
 import (
@@ -9,68 +9,68 @@ import (
 //STRTS
 
 type CephaloTimeNode struct {
-	datetime time.Time
-	data     float64
+	Datetime time.Time
+	Data     float64
 	left     *CephaloTimeNode
 	right    *CephaloTimeNode
 }
 
 type CephaloTimeSeries struct {
-	size int
-	root *CephaloTimeNode
+	Size int
+	Root *CephaloTimeNode
 }
 
-//NewCTS creates an empty first-root only time series // convenience
+//NewCTS creates an empty first-Root only time series // convenience
 func NewCTS() CephaloTimeSeries {
 	return CephaloTimeSeries{}
 }
 
 //Insert provides a way to insert new tree node in the appropriate place
-func (cts *CephaloTimeSeries) Insert(dattime time.Time, data float64) error {
-	if cts.root == nil {
-		cts.root = &CephaloTimeNode{datetime: dattime, data: data}
-		cts.size++
+func (cts *CephaloTimeSeries) Insert(dattime time.Time, Data float64) error {
+	if cts.Root == nil {
+		cts.Root = &CephaloTimeNode{Datetime: dattime, Data: Data}
+		cts.Size++
 		return nil
 	}
-	cts.size++
-	return cts.root.insert(dattime, data)
+	cts.Size++
+	return cts.Root.insert(dattime, Data)
 }
 
-//Find offers fast retrieval of the desired data point based on the supplied time
+//Find offers fast retrieval of the desired Data point based on the supplied time
 func (cts *CephaloTimeSeries) Find(dattime time.Time) (*CephaloTimeNode, bool) {
-	if cts.root == nil {
+	if cts.Root == nil {
 		return &CephaloTimeNode{}, false
 	}
-	return cts.root.find(dattime)
+	return cts.Root.find(dattime)
 }
 
-//FindRange returns all of the tree nodes, i.e. tree datapoints for the requested range
+//FindRange returns all of the tree nodes, i.e. tree Datapoints for the requested range
 func (cts *CephaloTimeSeries) FindRange(start time.Time, end time.Time) ([]*CephaloTimeNode, error) {
 	var fop []*CephaloTimeNode
-	if cts.root == nil || end.Before(start) {
-		return fop, errors.New("No tree root element or the end is before the start")
+	if cts.Root == nil || end.Before(start) {
+		return fop, errors.New("No tree Root element or the end is before the start")
 	}
-	return cts.root.findRange(start, end)
+	return cts.Root.findRange(start, end)
 }
 
-//Delete removes the designated datapoint from the time series tree
+//Delete removes the designated Datapoint from the time series tree
 func (cts *CephaloTimeSeries) Delete(dattime time.Time) error {
-	if cts.root == nil {
+	if cts.Root == nil {
 		return errors.New("Deletion can not be performed in an empty tree")
 	}
-	fakeParent := &CephaloTimeNode{right: cts.root}
-	err := cts.root.delete(dattime, fakeParent)
+	fakeParent := &CephaloTimeNode{right: cts.Root}
+	err := cts.Root.delete(dattime, fakeParent)
 	if err != nil {
 		return err
 	}
 	if fakeParent.right == nil {
-		cts.root = nil
+		cts.Root = nil
 	}
-	cts.size--
+	cts.Size--
 	return nil
 }
 
-//TraversalMap offers inorder traversal of the timeseries with a callback/map function returning a datapoint pointer
+//TraversalMap offers inorder traversal of the timeseries with a callback/map function returning a Datapoint pointer
 func (cts *CephaloTimeSeries) TraversalMap(ctn *CephaloTimeNode, callback func(*CephaloTimeNode)) {
 	if ctn == nil {
 		return
@@ -85,8 +85,8 @@ func (cts *CephaloTimeSeries) TraversalMap(ctn *CephaloTimeNode, callback func(*
 func (cts *CephaloTimeSeries) EndpointsMap(period time.Duration, ctn *CephaloTimeNode, callback func(*CephaloTimeNode)) {
 	runningnode, _ := ctn.findMin(nil)
 	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
-		controltime := runningnode.datetime.Add(period)
-		if current.datetime.Equal(controltime) || current.datetime.After(controltime) {
+		controltime := runningnode.Datetime.Add(period)
+		if current.Datetime.Equal(controltime) || current.Datetime.After(controltime) {
 			callback(ctn)
 			runningnode = current
 		}
@@ -94,7 +94,7 @@ func (cts *CephaloTimeSeries) EndpointsMap(period time.Duration, ctn *CephaloTim
 }
 
 //PeriodApply perfoms the series partial application of the supplied function, thus returning
-//an enetierly new series of the period endpoints length (last duration unit) with data transformed
+//an enetierly new series of the period endpoints length (last duration unit) with Data transformed
 //accordingly. It is expected that the applied function returns a new CephaloTimeNode instead of
 //a pointer to an already used one
 func (cts *CephaloTimeSeries) PeriodApply(period time.Duration, ctn *CephaloTimeNode, applied func([]*CephaloTimeNode) CephaloTimeNode) CephaloTimeSeries {
@@ -102,10 +102,10 @@ func (cts *CephaloTimeSeries) PeriodApply(period time.Duration, ctn *CephaloTime
 	runningnode, _ := ctn.findMin(nil)
 	var runnernodes []*CephaloTimeNode
 	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
-		controltime := runningnode.datetime.Add(period)
-		if current.datetime.Equal(controltime) || current.datetime.After(controltime) {
+		controltime := runningnode.Datetime.Add(period)
+		if current.Datetime.Equal(controltime) || current.Datetime.After(controltime) {
 			calcnode := applied(runnernodes)
-			nts.Insert(calcnode.datetime, calcnode.data)
+			nts.Insert(calcnode.Datetime, calcnode.Data)
 			runnernodes = nil
 			runningnode = current
 		}
@@ -121,12 +121,12 @@ func (cts *CephaloTimeSeries) PeriodApply(period time.Duration, ctn *CephaloTime
 func (cts *CephaloTimeSeries) RollApply(period time.Duration, ctn *CephaloTimeNode, minn int, applied func([]*CephaloTimeNode) CephaloTimeNode) CephaloTimeSeries {
 	nts := NewCTS()
 	cts.TraversalMap(ctn, func(current *CephaloTimeNode) {
-		rollwinstart := current.datetime.Add(-period) //TODO - left, right and center align
-		rollwinend := current.datetime
+		rollwinstart := current.Datetime.Add(-period) //TODO - left, right and center align
+		rollwinend := current.Datetime
 		inrange, _ := current.findRange(rollwinstart, rollwinend)
 		if len(inrange) >= minn {
 			calcnode := applied(inrange)
-			nts.Insert(calcnode.datetime, calcnode.data)
+			nts.Insert(calcnode.Datetime, calcnode.Data)
 		}
 	})
 	return nts
@@ -135,36 +135,36 @@ func (cts *CephaloTimeSeries) RollApply(period time.Duration, ctn *CephaloTimeNo
 //RollMean provides the usual rolling mean (moving average) of the time series,
 //but based on the period rather than the number of observations
 func (cts *CephaloTimeSeries) RollMean(period time.Duration, minn int) CephaloTimeSeries {
-	return cts.RollApply(period, cts.root, minn, func(currents []*CephaloTimeNode) CephaloTimeNode {
-		nctt := CephaloTimeNode{datetime: currents[len(currents)-1].datetime, data: 0}
-		var valdata float64
+	return cts.RollApply(period, cts.Root, minn, func(currents []*CephaloTimeNode) CephaloTimeNode {
+		nctt := CephaloTimeNode{Datetime: currents[len(currents)-1].Datetime, Data: 0}
+		var valData float64
 		for _, cu := range currents {
-			valdata += cu.data
+			valData += cu.Data
 		}
-		nctt.data = valdata / float64(len(currents))
+		nctt.Data = valData / float64(len(currents))
 		return nctt
 	})
 }
 
 //Node methods considered private (insert, find)
-func (ctn *CephaloTimeNode) insert(dattime time.Time, data float64) error {
-	nctt := CephaloTimeNode{datetime: dattime, data: data}
+func (ctn *CephaloTimeNode) insert(dattime time.Time, Data float64) error {
+	nctt := CephaloTimeNode{Datetime: dattime, Data: Data}
 	switch {
-	case nctt.datetime.After(ctn.datetime):
+	case nctt.Datetime.After(ctn.Datetime):
 		//Check right
 		if ctn.right == nil {
 			ctn.right = &nctt
 			return nil
 		} else {
-			ctn.right.insert(nctt.datetime, nctt.data)
+			ctn.right.insert(nctt.Datetime, nctt.Data)
 		}
-	case nctt.datetime.Before(ctn.datetime):
+	case nctt.Datetime.Before(ctn.Datetime):
 		//Check left
 		if ctn.left == nil {
 			ctn.left = &nctt
 			return nil
 		} else {
-			ctn.left.insert(nctt.datetime, nctt.data)
+			ctn.left.insert(nctt.Datetime, nctt.Data)
 		}
 	}
 	return nil
@@ -175,9 +175,9 @@ func (ctn *CephaloTimeNode) find(dattime time.Time) (*CephaloTimeNode, bool) {
 		return &CephaloTimeNode{}, false
 	}
 	switch {
-	case ctn.datetime.Equal(dattime):
+	case ctn.Datetime.Equal(dattime):
 		return ctn, true
-	case dattime.After(ctn.datetime):
+	case dattime.After(ctn.Datetime):
 		return ctn.right.find(dattime)
 	default:
 		return ctn.left.find(dattime)
@@ -199,13 +199,13 @@ func findRangeInner(ctn *CephaloTimeNode, start time.Time, end time.Time, cb fun
 	if ctn == nil {
 		return
 	}
-	if start.Before(ctn.datetime) {
+	if start.Before(ctn.Datetime) {
 		findRangeInner(ctn.left, start, end, cb)
 	}
-	if (start.Before(ctn.datetime) || start.Equal(ctn.datetime)) && (end.After(ctn.datetime) || end.Equal(ctn.datetime)) {
+	if (start.Before(ctn.Datetime) || start.Equal(ctn.Datetime)) && (end.After(ctn.Datetime) || end.Equal(ctn.Datetime)) {
 		cb(ctn)
 	}
-	if end.After(ctn.datetime) {
+	if end.After(ctn.Datetime) {
 		findRangeInner(ctn.right, start, end, cb)
 	}
 }
@@ -245,9 +245,9 @@ func (ctn *CephaloTimeNode) delete(dattime time.Time, parent *CephaloTimeNode) e
 		return errors.New("Can't delete from a nil node")
 	}
 	switch {
-	case dattime.Before(ctn.datetime):
+	case dattime.Before(ctn.Datetime):
 		return ctn.left.delete(dattime, ctn)
-	case dattime.After(ctn.datetime):
+	case dattime.After(ctn.Datetime):
 		return ctn.right.delete(dattime, ctn)
 	default:
 		//If node is leaf node it has no children then remove it from its parent
@@ -267,11 +267,11 @@ func (ctn *CephaloTimeNode) delete(dattime time.Time, parent *CephaloTimeNode) e
 		//If the node is inner then steps are:
 		//1. in the left subtree find largest
 		leftmax, leftmaxparent := ctn.left.findMax(ctn)
-		//2. replace my value and data with
-		ctn.datetime = leftmax.datetime
-		ctn.data = leftmax.data
+		//2. replace my value and Data with
+		ctn.Datetime = leftmax.Datetime
+		ctn.Data = leftmax.Data
 		//3. remove replacement node
-		return leftmax.delete(leftmax.datetime, leftmaxparent)
+		return leftmax.delete(leftmax.Datetime, leftmaxparent)
 	}
 }
 

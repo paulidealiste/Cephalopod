@@ -1,10 +1,12 @@
 package cephalofile
 
 import (
-	"fmt"
+	"math/rand"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/paulidealiste/Cephalopod/cephalobjects"
 	"github.com/paulidealiste/Cephalopod/cephalokmeans"
 	"github.com/paulidealiste/Cephalopod/cephalorandom"
 )
@@ -20,11 +22,24 @@ func TestExportDataStore(t *testing.T) {
 	}
 }
 
+func TestExportTimeseries(t *testing.T) {
+	testtree := cephalobjects.NewCTS()
+	ad := time.Now()
+	as := time.Now()
+	for i := 0; i < 100; i++ {
+		ad = ad.Add(10 * time.Minute)
+		as = as.Add(-10 * time.Minute)
+		testtree.Insert(ad, rand.Float64())
+		testtree.Insert(as, rand.Float64())
+	}
+	ExportTimeSeries(testtree)
+}
+
 // Is Iris data properly read from a .csv
 func TestImportCSV(t *testing.T) {
-	rawiris := ImportCSV("iris.csv")
-	fmt.Println(rawiris[0])
-	if len(rawiris) == 0 {
-		t.Error("Probarbly not imported at all")
-	}
+	// rawiris := ImportCSV("iris.csv")
+	// fmt.Println(rawiris[0])
+	// if len(rawiris) == 0 {
+	// 	t.Error("Probarbly not imported at all")
+	// }
 }
