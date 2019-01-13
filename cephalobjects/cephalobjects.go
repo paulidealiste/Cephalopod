@@ -87,3 +87,10 @@ type AnovaSummary struct {
 	F             float64
 	P             float64
 }
+
+// TimeSeriesDataPoint default output for json
+type TimeSeriesDataPoint struct {
+	ID       int
+	Datetime string
+	Data     float64
+}

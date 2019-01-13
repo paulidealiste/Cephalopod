@@ -34,12 +34,3 @@ func TestExportTimeseries(t *testing.T) {
 	}
 	ExportTimeSeries(testtree)
 }
-
-// Is Iris data properly read from a .csv
-func TestImportCSV(t *testing.T) {
-	// rawiris := ImportCSV("iris.csv")
-	// fmt.Println(rawiris[0])
-	// if len(rawiris) == 0 {
-	// 	t.Error("Probarbly not imported at all")
-	// }
-}

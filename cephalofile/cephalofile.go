@@ -36,10 +36,14 @@ func ExportTimeSeries(input cephalobjects.CephaloTimeSeries) {
 }
 
 func encodeTimeSeries(input cephalobjects.CephaloTimeSeries) string {
-	var fullma []time.Time
+	var fullma []cephalobjects.TimeSeriesDataPoint
+	pointcount := 0
 	input.TraversalMap(input.Root, func(current *cephalobjects.CephaloTimeNode) {
-		fullma = append(fullma, current.Datetime)
+		tsdp := cephalobjects.TimeSeriesDataPoint{ID: pointcount, Datetime: current.Datetime.Format(time.RFC3339), Data: current.Data}
+		fullma = append(fullma, tsdp)
+		pointcount++
 	})
+
 	ts, _ := json.MarshalIndent(fullma, "", " ")
 	return string(ts)
 }
