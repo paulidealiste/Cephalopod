@@ -37,6 +37,10 @@ func TSListsFromTSTrees(ctss []cephalobjects.CephaloTimeSeries) map[int]cephalob
 	for w := 1; w <= 3; w++ {
 		go tslistworker(w, jobs, results)
 	}
+	for _, cts := range ctss {
+		jobs <- cts
+	}
+	close(jobs)
 
 	return tsdlsm
 }
