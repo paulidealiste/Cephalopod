@@ -5,9 +5,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
-	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
+	"github.com/paulidealiste/Cephalopod/cephaloutils"
 )
 
 // ExportDataStore takes DataStore and writes its contents to a table
@@ -36,14 +36,7 @@ func ExportTimeSeries(input cephalobjects.CephaloTimeSeries) {
 }
 
 func encodeTimeSeries(input cephalobjects.CephaloTimeSeries) string {
-	var fullma []cephalobjects.TimeSeriesDataPoint
-	pointcount := 0
-	input.TraversalMap(input.Root, func(current *cephalobjects.CephaloTimeNode) {
-		tsdp := cephalobjects.TimeSeriesDataPoint{ID: pointcount, Datetime: current.Datetime.Format(time.RFC3339), Data: current.Data}
-		fullma = append(fullma, tsdp)
-		pointcount++
-	})
-
+	fullma := cephaloutils.TSListForm(input)
 	ts, _ := json.MarshalIndent(fullma, "", " ")
 	return string(ts)
 }

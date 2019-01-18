@@ -1,8 +1,9 @@
-// Package cephaloutils provides various utility functions (i.e. min, max, range, ...)
+// Package cephaloutils provides various utility functions (i.e. min, max, range and timeseries utils ...)
 package cephaloutils
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -268,4 +269,12 @@ func ShortestString(stc []string) string {
 		}
 	}
 	return shortest
+}
+
+// Elapsed creates the deferable execution time measurement utility
+func Elapsed(target string) func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("%s took %v\n", target, time.Since(start))
+	}
 }

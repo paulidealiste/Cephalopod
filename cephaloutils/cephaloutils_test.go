@@ -66,7 +66,6 @@ func TestMinSliceIndex(t *testing.T) {
 }
 
 // Tests the knownd matrix vector product
-
 func TestDotProduct(t *testing.T) {
 	testvec := []float64{-2, 40, 4}
 	var testmat cephalobjects.DataMatrix
@@ -159,10 +158,65 @@ func TestDataMatrixMin(t *testing.T) {
 
 }
 
+// Do you really know which string is the shortest?
 func TestShortestString(t *testing.T) {
 	teststrings := []string{"remork", "anak", "sterlinz", "amu", "pretkola"}
 	test := ShortestString(teststrings)
 	if test != "amu" {
 		t.Error("Haven't found the shortest string element")
+	}
+}
+
+//
+// Timeseries utilities testing
+//
+
+// Does traversal ts -> list really work?
+
+func TestTSListFormAndMap(t *testing.T) {
+	testtree := cephalobjects.NewCTS()
+	ad := time.Now()
+	as := time.Now()
+	for i := 0; i < 100; i++ {
+		ad = ad.Add(10 * time.Minute)
+		as = as.Add(-10 * time.Minute)
+		testtree.Insert(ad, rand.Float64())
+		testtree.Insert(as, rand.Float64())
+	}
+	testTSList := CTSListForm(testtree)
+	if len(testTSList.Data) != testtree.Size {
+		t.Error("Probably not an accurate traversal list")
+	}
+	testTSMap := CTSListMap(testtree)
+	if len(testTSMap[testtree.ID].Data) != testtree.Size {
+		t.Error("Probably not an accurate traversal map")
+	}
+}
+
+func TestTSListsFromTSTrees(t *testing.T) {
+	testtree := cephalobjects.NewCTS()
+	ad := time.Now()
+	as := time.Now()
+	for i := 0; i < 1000; i++ {
+		ad = ad.Add(10 * time.Minute)
+		as = as.Add(-10 * time.Minute)
+		testtree.Insert(ad, rand.Float64())
+		testtree.Insert(as, rand.Float64())
+	}
+	testtree2 := cephalobjects.NewCTS()
+	ad = time.Now()
+	as = time.Now()
+	for i := 0; i < 1000; i++ {
+		ad = ad.Add(20 * time.Minute)
+		as = as.Add(-20 * time.Minute)
+		testtree.Insert(ad, rand.Float64())
+		testtree.Insert(as, rand.Float64())
+	}
+
+	testtrees := []cephalobjects.CephaloTimeSeries{testtree, testtree2}
+	defer Elapsed("MultiMapFromTree")()
+	test := TSListsFromTSTrees(testtrees)
+	if len(test[testtree.ID].Data) != testtree.Size {
+		t.Error("Does the multi map really exist?")
 	}
 }

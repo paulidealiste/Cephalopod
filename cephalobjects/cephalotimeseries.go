@@ -3,6 +3,7 @@ package cephalobjects
 
 import (
 	"errors"
+	"math/rand"
 	"time"
 )
 
@@ -17,12 +18,13 @@ type CephaloTimeNode struct {
 
 type CephaloTimeSeries struct {
 	Size int
+	ID   int
 	Root *CephaloTimeNode
 }
 
 //NewCTS creates an empty first-Root only time series // convenience
 func NewCTS() CephaloTimeSeries {
-	return CephaloTimeSeries{}
+	return CephaloTimeSeries{ID: randomCTSID()}
 }
 
 //Insert provides a way to insert new tree node in the appropriate place
@@ -274,6 +276,14 @@ func (ctn *CephaloTimeNode) delete(dattime time.Time, parent *CephaloTimeNode) e
 		return leftmax.delete(leftmax.Datetime, leftmaxparent)
 	}
 }
+
+func randomCTSID() int {
+	source := rand.NewSource(time.Now().UnixNano())
+	driver := rand.New(source)
+	return 10000000 + driver.Intn(99999999-10000000)
+}
+
+//Utils
 
 //AbsDuration returns the absolute value of the supplied time.Duration
 func AbsDuration(duration time.Duration) time.Duration {
