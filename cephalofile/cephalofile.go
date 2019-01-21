@@ -11,8 +11,8 @@ import (
 )
 
 // ExportDataStore takes DataStore and writes its contents to a table
-func ExportDataStore(input cephalobjects.DataStore) {
-	f, _ := os.Create("../dump.json")
+func ExportDataStore(input cephalobjects.DataStore, path string) {
+	f, _ := os.Create(path)
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
@@ -25,9 +25,9 @@ func encodeDataStore(input cephalobjects.DataStore) string {
 	return string(jo)
 }
 
-// ExportTimeSeries takes an input TimeSeries and flushes its content
-func ExportTimeSeries(input cephalobjects.CephaloTimeSeries) {
-	f, _ := os.Create("../tsdump.json")
+// ExportTimeSeries takes an input cephalotimeseries and flushes its content
+func ExportTimeSeries(input cephalobjects.CephaloTimeSeries, path string) {
+	f, _ := os.Create(path)
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
@@ -36,7 +36,18 @@ func ExportTimeSeries(input cephalobjects.CephaloTimeSeries) {
 }
 
 func encodeTimeSeries(input cephalobjects.CephaloTimeSeries) string {
-	fullma := cephaloutils.TSListForm(input)
+	fullma := cephaloutils.CTSListMap(input)
 	ts, _ := json.MarshalIndent(fullma, "", " ")
 	return string(ts)
+}
+
+// ExportTimeSeriesList is a list-based version of cephalotimeseries to json export
+func ExportTimeSeriesList(input []cephalobjects.CephaloTimeSeries, path string) {
+	f, _ := os.Create(path)
+	defer f.Close()
+
+	w := bufio.NewWriter(f)
+	timeserieslistmaps, _ := json.MarshalIndent(cephaloutils.TSListsFromTSTrees(input), "", " ")
+	w.WriteString(string(timeserieslistmaps))
+	w.Flush()
 }

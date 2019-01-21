@@ -2,7 +2,6 @@
 package cephaloutils
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
@@ -41,15 +40,16 @@ func TSListsFromTSTrees(ctss []cephalobjects.CephaloTimeSeries) map[int]cephalob
 		jobs <- cts
 	}
 	close(jobs)
-
+	for i := 0; i < len(ctss); i++ {
+		templistform := <-results
+		tsdlsm[templistform.ID] = templistform
+	}
 	return tsdlsm
 }
 
 func tslistworker(id int, jobs <-chan cephalobjects.CephaloTimeSeries, results chan<- cephalobjects.TimeSeriesDataLike) {
 	for cts := range jobs {
-		fmt.Println("worker", id, "started  job", cts.ID)
 		tsdl := CTSListForm(cts)
-		fmt.Println("worker", id, "finished job", cts.ID)
 		results <- tsdl
 	}
 }
