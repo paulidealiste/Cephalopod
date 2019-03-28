@@ -40,8 +40,8 @@ func TestCTSforNodes(t *testing.T) {
 	if err == nil {
 		t.Error("Should have failed when end is before start")
 	}
-	rfound, _ := test.findRange(ds.Add(-5*time.Minute), dd.Add(5*time.Minute))
-	fmt.Println(rfound[0].Datetime)
+	rfound, _ := test.findRange(ds.Add(-10*time.Minute), dd.Add(10*time.Minute))
+	fmt.Println(len(rfound))
 
 	//Find max/min Datetime CephaloTimeNode
 	max, parentMax := test.findMax(nil)
@@ -111,7 +111,7 @@ func TestCTSforTimeSeries(t *testing.T) {
 	}
 
 	rfound, _ := testtree.FindRange(ds.Add(-5*time.Minute), dd.Add(5*time.Minute))
-	fmt.Println(rfound[0].Datetime)
+	fmt.Println(rfound)
 
 	err = testtree.Delete(dd)
 	fmt.Println(err)

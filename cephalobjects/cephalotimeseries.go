@@ -3,6 +3,7 @@ package cephalobjects
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -149,25 +150,25 @@ func (cts *CephaloTimeSeries) RollMean(period time.Duration, minn int) CephaloTi
 }
 
 //Node methods considered private (insert, find)
-func (ctn *CephaloTimeNode) insert(dattime time.Time, Data float64) error {
-	nctt := CephaloTimeNode{Datetime: dattime, Data: Data}
+func (ctn *CephaloTimeNode) insert(dattime time.Time, data float64) error {
 	switch {
-	case nctt.Datetime.After(ctn.Datetime):
+	case dattime.Equal(ctn.Datetime):
+		return nil
+	case dattime.After(ctn.Datetime):
 		//Check right
 		if ctn.right == nil {
-			ctn.right = &nctt
+			ctn.right = &CephaloTimeNode{Datetime: dattime, Data: data}
 			return nil
-		} else {
-			ctn.right.insert(nctt.Datetime, nctt.Data)
 		}
-	case nctt.Datetime.Before(ctn.Datetime):
+		ctn.right.insert(dattime, data)
+
+	case dattime.Before(ctn.Datetime):
 		//Check left
 		if ctn.left == nil {
-			ctn.left = &nctt
+			ctn.left = &CephaloTimeNode{Datetime: dattime, Data: data}
 			return nil
-		} else {
-			ctn.left.insert(nctt.Datetime, nctt.Data)
 		}
+		ctn.left.insert(dattime, data)
 	}
 	return nil
 }
@@ -194,6 +195,7 @@ func (ctn *CephaloTimeNode) findRange(start time.Time, end time.Time) ([]*Cephal
 	findRangeInner(ctn, start, end, func(ctn *CephaloTimeNode) {
 		fop = append(fop, ctn)
 	})
+	fmt.Println(len(fop))
 	return fop, nil
 }
 
@@ -201,13 +203,15 @@ func findRangeInner(ctn *CephaloTimeNode, start time.Time, end time.Time, cb fun
 	if ctn == nil {
 		return
 	}
-	if start.Before(ctn.Datetime) {
+	if (start.Before(ctn.Datetime) || start.Equal(ctn.Datetime)) && (end.After(ctn.Datetime) || end.Equal(ctn.Datetime)) {
+		findRangeInner(ctn.left, start, end, cb)
+		cb(ctn)
+		findRangeInner(ctn.right, start, end, cb)
+	}
+	if start.Before(ctn.Datetime) && end.Before(ctn.Datetime) {
 		findRangeInner(ctn.left, start, end, cb)
 	}
-	if (start.Before(ctn.Datetime) || start.Equal(ctn.Datetime)) && (end.After(ctn.Datetime) || end.Equal(ctn.Datetime)) {
-		cb(ctn)
-	}
-	if end.After(ctn.Datetime) {
+	if start.After(ctn.Datetime) && end.After(ctn.Datetime) {
 		findRangeInner(ctn.right, start, end, cb)
 	}
 }

@@ -25,9 +25,13 @@ func TestExportDataStore(t *testing.T) {
 // Export cephalotimeseries to multi-series json test
 func TestExportTimeseries(t *testing.T) {
 	testtree := cephalobjects.NewCTS()
+
 	ad := time.Now()
 	as := time.Now()
-	for i := 0; i < 100; i++ {
+
+	testtree.Insert(as, rand.Float64())
+
+	for i := 0; i < 50; i++ {
 		ad = ad.Add(10 * time.Minute)
 		as = as.Add(-10 * time.Minute)
 		testtree.Insert(ad, rand.Float64())
@@ -39,15 +43,7 @@ func TestExportTimeseries(t *testing.T) {
 		t.Error("Export json file not found or generated")
 	}
 
-	testtree2 := cephalobjects.NewCTS()
-	ad = time.Now()
-	as = time.Now()
-	for i := 0; i < 100; i++ {
-		ad = ad.Add(20 * time.Minute)
-		as = as.Add(-20 * time.Minute)
-		testtree2.Insert(ad, rand.Float64())
-		testtree2.Insert(as, rand.Float64())
-	}
+	testtree2 := testtree.RollMean(time.Minute*20, 1)
 
 	testtreeslice := []cephalobjects.CephaloTimeSeries{testtree, testtree2}
 	ExportTimeSeriesList(testtreeslice, "../tssdump.json")

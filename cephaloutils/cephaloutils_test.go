@@ -197,7 +197,7 @@ func TestTSListsFromTSTrees(t *testing.T) {
 	testtree := cephalobjects.NewCTS()
 	ad := time.Now()
 	as := time.Now()
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 50; i++ {
 		ad = ad.Add(10 * time.Minute)
 		as = as.Add(-10 * time.Minute)
 		testtree.Insert(ad, rand.Float64())
@@ -206,14 +206,15 @@ func TestTSListsFromTSTrees(t *testing.T) {
 	testtree2 := cephalobjects.NewCTS()
 	ad = time.Now()
 	as = time.Now()
-	for i := 0; i < 1000; i++ {
+	for j := 0; j < 50; j++ {
 		ad = ad.Add(20 * time.Minute)
 		as = as.Add(-20 * time.Minute)
-		testtree.Insert(ad, rand.Float64())
-		testtree.Insert(as, rand.Float64())
+		testtree2.Insert(ad, rand.Float64())
+		testtree2.Insert(as, rand.Float64())
 	}
 
 	testtrees := []cephalobjects.CephaloTimeSeries{testtree, testtree2}
+
 	defer Elapsed("MultiMapFromTree")()
 	test := TSListsFromTSTrees(testtrees)
 	if len(test[testtree.ID].Data) != testtree.Size {
