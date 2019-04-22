@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/paulidealiste/Cephalopod/cephalobjects"
@@ -277,4 +278,16 @@ func Elapsed(target string) func() {
 	return func() {
 		fmt.Printf("%s took %v\n", target, time.Since(start))
 	}
+}
+
+// IntsliceToString returns array of strings instead of array of integers
+func IntsliceToString(input []int) []string {
+	output := make([]string, len(input))
+	if len(input) == 0 {
+		return output
+	}
+	for i, n := range input {
+		output[i] = strconv.Itoa(n)
+	}
+	return output
 }

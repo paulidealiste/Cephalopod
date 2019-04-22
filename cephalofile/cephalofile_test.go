@@ -1,6 +1,7 @@
 package cephalofile
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"testing"
@@ -51,5 +52,14 @@ func TestExportTimeseries(t *testing.T) {
 	if op == nil || err != nil {
 		t.Error("ExportList json file not found or generated")
 	}
+}
 
+func TestExportAnnonymusCSV(t *testing.T) {
+	fl := []int{1, 2, 4, 4, 5}
+	in := [][]int{fl, fl, fl, fl, fl, fl, fl}
+	err := ExportAnnonymusCSV(in, "boolion.csv")
+	if err != nil {
+		t.Error("CSV export did not work properly.")
+		fmt.Println(err)
+	}
 }

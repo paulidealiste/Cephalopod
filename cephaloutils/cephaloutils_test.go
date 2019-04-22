@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 
@@ -219,5 +220,14 @@ func TestTSListsFromTSTrees(t *testing.T) {
 	test := TSListsFromTSTrees(testtrees)
 	if len(test[testtree.ID].Data) != testtree.Size {
 		t.Error("Does the multi map really exist?")
+	}
+}
+
+func TestIntsliceToString(t *testing.T) {
+	in := []int{1, 2, 3, 4, 5, 6}
+	test := IntsliceToString(in)
+	strth, _ := strconv.Atoi(test[0])
+	if strth != in[0] {
+		t.Error("The conversion did not go smoothly.")
 	}
 }

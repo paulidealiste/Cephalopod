@@ -3,6 +3,7 @@ package cephalofile
 
 import (
 	"bufio"
+	"encoding/csv"
 	"encoding/json"
 	"os"
 
@@ -23,6 +24,23 @@ func ExportDataStore(input cephalobjects.DataStore, path string) {
 func encodeDataStore(input cephalobjects.DataStore) string {
 	jo, _ := json.MarshalIndent(input.Basic, "", " ")
 	return string(jo)
+}
+
+// ExportAnnonymusCSV writes 2D integer array data to a file of choice
+func ExportAnnonymusCSV(input [][]int, filename string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	for _, row := range input {
+		if err := writer.Write(cephaloutils.IntsliceToString(row)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ExportTimeSeries takes an input cephalotimeseries and flushes its content
